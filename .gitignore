@@ -1,0 +1,5 @@
+/src/*.suo
+/src/*/bin/*/*.*
+/src/*/obj/*/*.*
+/src/*/*.user
+/src/packages
