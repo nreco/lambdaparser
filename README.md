@@ -1,11 +1,11 @@
 # NReco LambdaParser
-Runtime parser for string expressions (formulas, method calls). Builds LINQ expression tree and compiles it to lambda delegate.
+Runtime parser for string expressions (formulas, method calls). Builds dynamic LINQ queries at runtime and compiles them to lambda delegates.
 
 * PCL (Portable) library: can be used with *any* .NET target framework
 * any number of variables (provided as dictionary or by callback delegate)
-* supports all arithmetic operations and conditionals
+* supports all arithmetic operations (+, -, *, /, %) and conditions (==, !=, >, <, >=, <=), conditional (ternary) operator ( ? : )
 * access object properties, call methods and indexers
-* runtime type conversions to match method signature or arithmetic operations
+* automatic runtime type conversions to match method signature or arithmetic operations
 * create arrays and dictionaries with simplified syntax: `new dictionary{ {"a", 1}, {"b", 2} }` , `new []{ 1, 2, 3}`
 
 ```
