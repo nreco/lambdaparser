@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 
 namespace NReco {
 	
@@ -31,6 +32,14 @@ namespace NReco {
 			get {
 				return _Instance;
 			}
+		}
+
+		private bool IsAssignableFrom(Type a, Type b) {
+			#if NET40
+			return a.IsAssignableFrom(b);
+			#else
+			return a.GetTypeInfo().IsAssignableFrom(b.GetTypeInfo() );
+			#endif
 		}
 
 		public int Compare(object a, object b) {
@@ -60,13 +69,13 @@ namespace NReco {
 			if (a is IComparable) {
 				var aComp = (IComparable)a;
 				// quick compare if types are fully compatible
-				if (a.GetType().IsAssignableFrom(b.GetType()))
+				if (IsAssignableFrom( a.GetType(), b.GetType() ))
 					return aComp.CompareTo(b);
 			}
 			if (b is IComparable) {
 				var bComp = (IComparable)b;
 				// quick compare if types are fully compatible
-				if (b.GetType().IsAssignableFrom(a.GetType()))
+				if (IsAssignableFrom( b.GetType(), a.GetType() ))
 					return -bComp.CompareTo(a);
 			}
 

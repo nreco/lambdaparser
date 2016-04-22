@@ -101,7 +101,12 @@ namespace NReco.Linq {
 				throw new NullReferenceException(String.Format("{0} is not a delegate", obj.GetType()));
 			var deleg = (Delegate)obj;
 
-			var delegParams = deleg.Method.GetParameters();
+			var delegParams =
+				#if NET40
+				 deleg.Method.GetParameters();
+				#else
+				 deleg.GetMethodInfo().GetParameters();
+				#endif
 			if (delegParams.Length != args.Length)
 				throw new TargetParameterCountException(
 					String.Format("Target delegate expects {0} parameters", delegParams.Length));
@@ -122,13 +127,22 @@ namespace NReco.Linq {
 				throw new NullReferenceException(String.Format("Property or field {0} target is null", propertyName));
 			if (obj is LambdaParameterWrapper)
 				obj = ((LambdaParameterWrapper)obj).Value;
-
+			
+			#if NET40
 			var prop = obj.GetType().GetProperty(propertyName);
+			#else
+			var prop = obj.GetType().GetRuntimeProperty(propertyName);
+			#endif
+
 			if (prop != null) {
 				var propVal = prop.GetValue(obj, null);
 				return new LambdaParameterWrapper(propVal);
 			}
+			#if NET40
 			var fld = obj.GetType().GetField(propertyName);
+			#else
+			var fld = obj.GetType().GetRuntimeField(propertyName);
+			#endif
 			if (fld != null) {
 				var fldVal = fld.GetValue(obj);
 				return new LambdaParameterWrapper(fldVal);
@@ -247,6 +261,11 @@ namespace NReco.Linq {
 		public static bool operator <=(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
 			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
 			return compareRes <= 0;
+		}
+
+		public static LambdaParameterWrapper operator !(LambdaParameterWrapper c1) {
+			var c1bool = Convert.ToBoolean(c1.Value, CultureInfo.InvariantCulture);
+			return new LambdaParameterWrapper( !c1bool );
 		}
 
 		public static LambdaParameterWrapper operator &(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {

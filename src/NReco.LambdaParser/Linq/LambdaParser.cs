@@ -174,7 +174,12 @@ namespace NReco.Linq {
 		}
 
 
-		ConstructorInfo LambdaParameterWrapperConstructor = typeof(LambdaParameterWrapper).GetConstructor(new[] { typeof(object) });
+		ConstructorInfo LambdaParameterWrapperConstructor = 
+			#if NET40
+			typeof(LambdaParameterWrapper).GetConstructor(new[] { typeof(object) });
+			#else
+			typeof(LambdaParameterWrapper).GetTypeInfo().DeclaredConstructors.First();
+			#endif
 
 		protected ParseResult ParseConditional(string expr, int start) {
 			var testExpr = ParseOr(expr, start);
@@ -368,34 +373,48 @@ namespace NReco.Linq {
 
 		protected ParseResult ParseUnary(string expr, int start) {
 			var opLexem = ReadLexem(expr, start);
-			if (opLexem.Type == LexemType.Delimiter && opLexem.GetValue() == "-") {
-				var operand = ParsePrimary(expr, opLexem.End);
-				operand.Expr = Expression.Negate(operand.Expr);
-				return operand;
+			if (opLexem.Type == LexemType.Delimiter) {
+				switch (opLexem.GetValue()) {
+					case "-": {
+						var operand = ParsePrimary(expr, opLexem.End);
+						operand.Expr = Expression.Negate(operand.Expr);
+						return operand;
+					}
+					case "!": {
+						var operand = ParsePrimary(expr, opLexem.End);
+						operand.Expr = Expression.Not(operand.Expr);
+						return operand;
+					}
+				}
 			}
 			return ParsePrimary(expr, start);
 		}
 
-		protected MethodInfo GetInvokeMethod() {
-			return typeof(LambdaParameterWrapper).GetMethod("InvokeMethod",
+		private MethodInfo GetLambdaParameterWrapperStaticMethod(string methodName) {
+			#if NET40
+			return typeof(LambdaParameterWrapper).GetMethod(methodName,
 				BindingFlags.Static | BindingFlags.Public);
+			#else
+			return typeof(LambdaParameterWrapper).GetTypeInfo().DeclaredMethods.Where(m=>m.Name==methodName).First();
+			#endif
 		}
+
+		protected MethodInfo GetInvokeMethod() {
+			return GetLambdaParameterWrapperStaticMethod("InvokeMethod");
+		}
+
 		protected MethodInfo GetInvokeDelegate() {
-			return typeof(LambdaParameterWrapper).GetMethod("InvokeDelegate",
-				BindingFlags.Static | BindingFlags.Public);
+			return GetLambdaParameterWrapperStaticMethod("InvokeDelegate");
 		}
 		protected MethodInfo GetPropertyOrFieldMethod() {
-			return typeof(LambdaParameterWrapper).GetMethod("InvokePropertyOrField",
-				BindingFlags.Static | BindingFlags.Public);
+			return GetLambdaParameterWrapperStaticMethod("InvokePropertyOrField");
 		}
 		protected MethodInfo GetIndexerMethod() {
-			return typeof(LambdaParameterWrapper).GetMethod("InvokeIndexer",
-				BindingFlags.Static | BindingFlags.Public);
+			return GetLambdaParameterWrapperStaticMethod("InvokeIndexer");
 		}
 		protected MethodInfo GetCreateDictionaryMethod() {
-			return typeof(LambdaParameterWrapper).GetMethod("CreateDictionary",
-				BindingFlags.Static | BindingFlags.Public);
-		}		
+			return GetLambdaParameterWrapperStaticMethod("CreateDictionary");
+		}
 
 		protected ParseResult ParsePrimary(string expr, int start) {
 			var val = ParseValue(expr, start);

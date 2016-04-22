@@ -1,5 +1,9 @@
-/src/*.suo
-/src/*/bin/*/*.*
-/src/*/obj/*/*.*
-/src/*/*.user
+.vs
+*.suo
+/src/*/bin/**/*.*
+/src/*/obj/**/*.*
+/src/**/*.user
 /src/packages
+*.lock.json
+*.nupkg
+*.dll
