@@ -35,11 +35,15 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\NReco.LambdaParser.XML</DocumentationFile>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>NReco.LambdaParser.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <None Include="NReco.LambdaParser.Portable.project.json" />
-    <None Include="NReco.LambdaParser.snk" />
+    <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InvokeMethod.cs" />

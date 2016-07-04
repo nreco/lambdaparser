@@ -1,9 +1,12 @@
 .vs
 *.suo
-/src/*/bin/**/*.*
-/src/*/obj/**/*.*
-/src/**/*.user
+*[Bb]in/
+*[Oo]bj/
+*[Dd]ebug/
+*.user
 /src/packages
 *.lock.json
 *.nupkg
 *.dll
+*.targets
+project.lock.json

@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("NReco.LambdaParser")]
-[assembly: AssemblyDescription("Runtime parser for string expressions (formulas, method calls etc). Builds LINQ expression tree and compiles it lambda delegate, supports dynamically typed variables.")]
+[assembly: AssemblyDescription("Runtime parser for string expressions (formulas, method calls etc). Builds LINQ expression tree and compiles it to lambda delegate, supports dynamically typed variables.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vitalii Fedorchenko")]
 [assembly: AssemblyProduct("NReco.LambdaParser")]
@@ -26,5 +26,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.1.0")]
-[assembly: AssemblyFileVersion("1.0.1.0")]
+[assembly: AssemblyVersion("1.0.2.0")]
+[assembly: AssemblyFileVersion("1.0.2.0")]
