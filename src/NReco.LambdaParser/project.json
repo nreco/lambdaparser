@@ -9,7 +9,7 @@
 		"projectUrl": "https://github.com/nreco/lambdaparser",
 		"licenseUrl": "https://raw.githubusercontent.com/nreco/lambdaparser/master/LICENSE",
 		"iconUrl": "http://www.nrecosite.com/img/nreco-logo-200.png",
-		"tags": [ "LambdaParser", "Formula", "Expression", "Parser", "Math", "Evaluator", "Eval" ]
+		"tags": [ "LambdaParser", "Formula", "Expression", "Parser", "Math", "Evaluator", "Eval", "PCL", "netstandard", "netcore", "net40", "net45", "WindowsPhone8", "Silverlight" ]
 	},
 
   "supports": {},
