@@ -19,5 +19,11 @@ varContext["one"] = 1M;
 varContext["two"] = 2M;
 varContext["test"] = "test";
 Console.WriteLine( lambdaParser.Eval("pi>one && 0<one ? (1+8)/3+1*two : 0", varContext) ); // --> 5
+Console.WriteLine( lambdaParser.Eval("test.ToUpper()", varContext) ); // --> TEST
 ```
 (see unit tests for more expression examples)
+
+## License
+Copyright 2016 Vitaliy Fedorchenko
+
+Distributed under the MIT license

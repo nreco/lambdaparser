@@ -2,7 +2,7 @@
 /*
  * NReco Lambda Parser (http://www.nrecosite.com/)
  * Copyright 2014-2016 Vitaliy Fedorchenko
- * Distributed under the LGPL licence
+ * Distributed under the MIT license
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
