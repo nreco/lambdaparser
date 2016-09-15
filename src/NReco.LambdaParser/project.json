@@ -1,6 +1,6 @@
 {
 	"title": "NReco.LambdaParser",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"authors": [ "Vitalii Fedorchenko" ],
 	"copyright": "Copyright (c) 2013-2016 Vitalii Fedorchenko",
 	"description": "Runtime parser for string expressions (formulas, method calls etc). Builds LINQ expression tree and compiles it to lambda delegate, supports dynamically typed variables.",

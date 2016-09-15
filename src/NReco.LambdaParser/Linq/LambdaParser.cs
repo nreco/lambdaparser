@@ -33,7 +33,7 @@ namespace NReco.Linq {
 			'(', ')', '[', ']', '?', ':', '.', ',', '=', '<', '>', '!', '&', '|', '*', '/', '%', '+','-', '{', '}'};
 		static readonly char[] specialNameChars = new char[] {
 			'_' };
-		static readonly char charQuote = '"';
+		const char charQuote = '"';
 		static readonly string[] mulOps = new[] {"*", "/", "%" };
 		static readonly string[] addOps = new[] { "+", "-" };
 		static readonly string[] eqOps = new[] { "==", "!=", "<", ">", "<=", ">=" };
@@ -523,6 +523,8 @@ namespace NReco.Linq {
 						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(true) ) };
 					case "false":
 						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(false) ) };
+					case "null":
+						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(null)) };
 					case "new":
 						return ReadNewInstance(expr, lexem.End);
 				}
