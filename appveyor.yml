@@ -16,4 +16,4 @@ build:
   verbosity: minimal
 
 test_script:
-- cmd: nunit-console src\NReco.LambdaParser.Tests\bin\Release\NReco.LambdaParser.Tests.dll
+- cmd: nunit-console src\NReco.LambdaParser.Tests\bin\Debug\NReco.LambdaParser.Tests.dll
