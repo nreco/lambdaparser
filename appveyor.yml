@@ -11,13 +11,11 @@ skip_tags: true
 
 install:
 - cmd: dotnet restore
+- cmd: nuget restore src\NReco.LambdaParser.Portable.sln -Prop Configuration=Release 
 
 build:
   project: NReco.LambdaParser.Portable.sln
   verbosity: minimal
-
-build_script:
-- cmd: nuget restore src\NReco.LambdaParser.Portable.sln
 
 test_script:
 - cmd: nunit-console src\NReco.LambdaParser.Tests\bin\Release\NReco.LambdaParser.Tests.dll
