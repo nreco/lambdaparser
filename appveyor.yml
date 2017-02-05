@@ -12,7 +12,7 @@ install:
 - cmd: nuget restore src\NReco.LambdaParser.Portable.sln
 
 build:
-  project: NReco.LambdaParser.Portable.sln
+  project: src\NReco.LambdaParser.Portable.sln
   verbosity: minimal
 
 test_script:
