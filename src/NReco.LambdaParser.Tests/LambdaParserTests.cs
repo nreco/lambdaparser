@@ -27,6 +27,8 @@ namespace NReco.Tests.Linq {
 			varContext["NOT"] = (Func<bool,bool>)( (t) => !t );
 			varContext["Yes"] = true;
 			varContext["nullVar"] = null;
+			varContext["name_with_underscore"] = "a_b";
+			varContext["_name_with_underscore"] = "_a_b";
 
 			Assert.AreEqual("st", lambdaParser.Eval("test.Substring(2)", varContext ) );
 
@@ -47,6 +49,8 @@ namespace NReco.Tests.Linq {
 			Assert.AreEqual(2.14, lambdaParser.Eval("pi + -one", varContext) );
 
 			Assert.AreEqual("test1", lambdaParser.Eval("test + \"1\"", varContext) );
+
+			Assert.AreEqual("a_b_a_b", lambdaParser.Eval(" name_with_underscore + _name_with_underscore ", varContext));
 
 			Assert.AreEqual(1, lambdaParser.Eval("true or false ? 1 : 0", varContext) );
 

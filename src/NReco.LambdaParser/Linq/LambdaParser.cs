@@ -137,9 +137,9 @@ namespace NReco.Linq {
 					if (lexem.Type == LexemType.Unknown)
 						lexem.Type = LexemType.NumberConstant;
 				} else if (Array.IndexOf(specialNameChars, s[lexem.End]) >= 0) {
-					if (lexem.Type == LexemType.Unknown)
+					if (lexem.Type == LexemType.Unknown || lexem.Type==LexemType.Name) {
 						lexem.Type = LexemType.Name;
-					else if (lexem.Type!=LexemType.StringConstant)
+					} else if (lexem.Type!=LexemType.StringConstant)
 						return lexem;
 				} else if (s[lexem.End] == charQuote) {
 					if (lexem.Type == LexemType.Unknown)

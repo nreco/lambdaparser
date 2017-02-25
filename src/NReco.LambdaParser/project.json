@@ -1,14 +1,14 @@
 {
 	"title": "NReco.LambdaParser",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"authors": [ "Vitalii Fedorchenko" ],
-	"copyright": "Copyright (c) 2013-2016 Vitalii Fedorchenko",
+	"copyright": "Copyright (c) 2013-2017 Vitalii Fedorchenko",
 	"description": "Runtime parser for string expressions (formulas, method calls etc). Builds LINQ expression tree and compiles it to lambda delegate, supports dynamically typed variables.",
 	"packOptions": {
 		"owners": [ "Vitalii Fedorchenko" ],
 		"projectUrl": "https://github.com/nreco/lambdaparser",
 		"licenseUrl": "https://raw.githubusercontent.com/nreco/lambdaparser/master/LICENSE",
-		"iconUrl": "http://www.nrecosite.com/img/nreco-logo-200.png",
+		"iconUrl": "https://www.nrecosite.com/img/nreco-logo-200.png",
 		"tags": [ "LambdaParser", "Formula", "Expression", "Parser", "Math", "Evaluator", "Eval", "PCL", "netstandard", "netcore", "net40", "net45", "WindowsPhone8", "Silverlight" ]
 	},
 
