@@ -1,0 +1,86 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Runtime parser for string expressions (formulas, method calls etc). Builds LINQ expression tree and compiles it to lambda delegate, supports dynamically typed variables.</Description>
+    <Copyright>Copyright (c) 2013-2017 Vitalii Fedorchenko</Copyright>
+    <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
+    <VersionPrefix>1.0.5</VersionPrefix>
+    <Authors>Vitalii Fedorchenko</Authors>
+    <TargetFrameworks>portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8;netstandard1.3</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>NReco.LambdaParser</AssemblyName>
+    <AssemblyOriginatorKeyFile>NReco.LambdaParser.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>false</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>NReco.LambdaParser</PackageId>
+    <PackageTags>LambdaParser;Formula;Expression;Parser;Math;Evaluator;Eval;PCL;netstandard;netcore;net40;net45;WindowsPhone8;Silverlight</PackageTags>
+    <PackageIconUrl>https://www.nrecosite.com/img/nreco-logo-200.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/nreco/lambdaparser</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/nreco/lambdaparser/master/LICENSE</PackageLicenseUrl>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'portable45-net45+win8+wp8+wpa81' ">
+	<Reference Include="System" />
+	<Reference Include="System.Collections" />
+	<Reference Include="System.Core" />
+	<Reference Include="System.IO" />
+	<Reference Include="System.Reflection" />
+	<Reference Include="System.Linq" />
+	<Reference Include="System.Linq.Expressions" />
+	<Reference Include="System.Runtime" />
+	<Reference Include="System.Resources.ResourceManager" />
+	<Reference Include="System.Reflection.Extensions" />
+	<Reference Include="System.Globalization" />
+	<Reference Include="System.Runtime.Extensions" />
+	<Reference Include="System.Threading" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8' ">
+	<TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
+	<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+	<TargetFrameworkProfile>Profile259</TargetFrameworkProfile>    
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8' ">
+	<Reference Include="System.Core" />
+	<Reference Include="System" />
+	<Reference Include="System.Collections"/>
+	<Reference Include="System.IO"/>
+	<Reference Include="System.Reflection"/>
+	<Reference Include="System.Linq"/>
+	<Reference Include="System.Linq.Expressions"/>
+	<Reference Include="System.Runtime"/>	
+	<Reference Include="System.Resources.ResourceManager"/>	
+	<Reference Include="System.Reflection.Extensions"/>
+	<Reference Include="System.Globalization"/>	
+	<Reference Include="System.Runtime.Extensions"/>
+	<Reference Include="System.Threading"/>	
+  </ItemGroup>  
+  
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'portable-net40+sl5+win8+wpa81+wp8' ">
+ 	<TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
+	<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+	<TargetFrameworkProfile>Profile328</TargetFrameworkProfile>   
+    <DefineConstants>$(DefineConstants);NET40</DefineConstants>
+  </PropertyGroup>
+  
+   <ItemGroup Condition=" '$(TargetFramework)' == 'portable-net40+sl5+win8+wpa81+wp8' ">
+	<Reference Include="mscorlib" />
+	<Reference Include="System.Core" />
+	<Reference Include="System" />
+  </ItemGroup> 
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
+  </ItemGroup>
+
+</Project>

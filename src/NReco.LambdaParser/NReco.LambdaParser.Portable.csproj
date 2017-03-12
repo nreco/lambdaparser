@@ -42,10 +42,6 @@
     <AssemblyOriginatorKeyFile>NReco.LambdaParser.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <!-- A reference to the entire .NET Framework is automatically included -->
-    <None Include="project.json" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="InvokeMethod.cs" />
     <Compile Include="Linq\LambdaParameterWrapper.cs" />
     <Compile Include="Linq\LambdaParser.cs" />
