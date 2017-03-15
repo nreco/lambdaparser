@@ -38,7 +38,8 @@ namespace NReco.Linq {
 		static readonly string[] addOps = new[] { "+", "-" };
 		static readonly string[] eqOps = new[] { "==", "!=", "<", ">", "<=", ">=" };
 
-		static IDictionary<string, CompiledExpression> CachedExpressions = new Dictionary<string, CompiledExpression>();
+		static readonly IDictionary<string, CompiledExpression> CachedExpressions = new Dictionary<string, CompiledExpression>();
+		static readonly object _lock = new object();
 
 		/// <summary>
 		/// Gets or sets whether LambdaParser should use the cache for parsed expressions.
@@ -77,8 +78,14 @@ namespace NReco.Linq {
 		}
 
 		public object Eval(string expr, Func<string,object> getVarValue) {
-			CompiledExpression compiledExpr;
-			if (!UseCache || !CachedExpressions.TryGetValue(expr, out compiledExpr)) {
+			CompiledExpression compiledExpr = null;
+			if (UseCache) {
+				lock (_lock) {
+					CachedExpressions.TryGetValue(expr, out compiledExpr);
+				}
+			}
+
+			if (!UseCache || compiledExpr == null) {
 				var linqExpr = Parse(expr);
 				compiledExpr = new CompiledExpression() {
 					Parameters = GetExpressionParameters(linqExpr)
@@ -87,7 +94,7 @@ namespace NReco.Linq {
 				compiledExpr.Lambda = lambdaExpr.Compile();
 				
 				if (UseCache)
-					lock (CachedExpressions) {
+					lock (_lock) {
 						CachedExpressions[expr] = compiledExpr;
 					}
 			}
