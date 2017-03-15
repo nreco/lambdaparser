@@ -85,7 +85,7 @@ namespace NReco.Linq {
 				}
 			}
 
-			if (!UseCache || compiledExpr == null) {
+			if (compiledExpr == null) {
 				var linqExpr = Parse(expr);
 				compiledExpr = new CompiledExpression() {
 					Parameters = GetExpressionParameters(linqExpr)
