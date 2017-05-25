@@ -38,7 +38,8 @@ namespace NReco.Linq {
 		static readonly string[] addOps = new[] { "+", "-" };
 		static readonly string[] eqOps = new[] { "==", "!=", "<", ">", "<=", ">=" };
 
-		static IDictionary<string, CompiledExpression> CachedExpressions = new Dictionary<string, CompiledExpression>();
+		static readonly IDictionary<string, CompiledExpression> CachedExpressions = new Dictionary<string, CompiledExpression>();
+		static readonly object _lock = new object();
 
 		/// <summary>
 		/// Gets or sets whether LambdaParser should use the cache for parsed expressions.
@@ -77,8 +78,14 @@ namespace NReco.Linq {
 		}
 
 		public object Eval(string expr, Func<string,object> getVarValue) {
-			CompiledExpression compiledExpr;
-			if (!UseCache || !CachedExpressions.TryGetValue(expr, out compiledExpr)) {
+			CompiledExpression compiledExpr = null;
+			if (UseCache) {
+				lock (_lock) {
+					CachedExpressions.TryGetValue(expr, out compiledExpr);
+				}
+			}
+
+			if (compiledExpr == null) {
 				var linqExpr = Parse(expr);
 				compiledExpr = new CompiledExpression() {
 					Parameters = GetExpressionParameters(linqExpr)
@@ -87,7 +94,7 @@ namespace NReco.Linq {
 				compiledExpr.Lambda = lambdaExpr.Compile();
 				
 				if (UseCache)
-					lock (CachedExpressions) {
+					lock (_lock) {
 						CachedExpressions[expr] = compiledExpr;
 					}
 			}
@@ -137,9 +144,9 @@ namespace NReco.Linq {
 					if (lexem.Type == LexemType.Unknown)
 						lexem.Type = LexemType.NumberConstant;
 				} else if (Array.IndexOf(specialNameChars, s[lexem.End]) >= 0) {
-					if (lexem.Type == LexemType.Unknown)
+					if (lexem.Type == LexemType.Unknown || lexem.Type==LexemType.Name) {
 						lexem.Type = LexemType.Name;
-					else if (lexem.Type!=LexemType.StringConstant)
+					} else if (lexem.Type!=LexemType.StringConstant)
 						return lexem;
 				} else if (s[lexem.End] == charQuote) {
 					if (lexem.Type == LexemType.Unknown)
