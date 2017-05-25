@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NReco.LambdaParser", "NReco.LambdaParser\NReco.LambdaParser.csproj", "{98AEE0C2-6A57-45AE-A54D-01D4EC370E09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NReco.LambdaParser.Tests", "NReco.LambdaParser.Tests\NReco.LambdaParser.Tests.csproj", "{7C5C1806-C3A7-494A-9EF0-A6304EBB5BEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NReco.LambdaParser.Portable", "NReco.LambdaParser\NReco.LambdaParser.Portable.csproj", "{2E4066D1-A58E-44BB-AB15-63DF19AADAEF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{98AEE0C2-6A57-45AE-A54D-01D4EC370E09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98AEE0C2-6A57-45AE-A54D-01D4EC370E09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98AEE0C2-6A57-45AE-A54D-01D4EC370E09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98AEE0C2-6A57-45AE-A54D-01D4EC370E09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C5C1806-C3A7-494A-9EF0-A6304EBB5BEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C5C1806-C3A7-494A-9EF0-A6304EBB5BEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C5C1806-C3A7-494A-9EF0-A6304EBB5BEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C5C1806-C3A7-494A-9EF0-A6304EBB5BEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E4066D1-A58E-44BB-AB15-63DF19AADAEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E4066D1-A58E-44BB-AB15-63DF19AADAEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E4066D1-A58E-44BB-AB15-63DF19AADAEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E4066D1-A58E-44BB-AB15-63DF19AADAEF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

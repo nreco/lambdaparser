@@ -1,5 +1,5 @@
 version: 1.0.{build}
-os: Visual Studio 2015
+os: Visual Studio 2013
 
 branches:
   only:
@@ -8,7 +8,6 @@ branches:
 skip_tags: true
 
 install:
-- cmd: dotnet restore
 - cmd: nuget restore src\NReco.LambdaParser.Portable.sln
 
 build:
