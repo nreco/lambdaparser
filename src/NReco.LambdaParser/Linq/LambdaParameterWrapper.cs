@@ -245,23 +245,92 @@ namespace NReco.Linq {
 			return c1 != c2bool;
 		}
 
-		public static bool operator >(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
-			return compareRes>0;
-		}
-		public static bool operator <(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
-			return compareRes < 0;
-		}
+        public static bool operator >(LambdaParameterWrapper c1, LambdaParameterWrapper c2)
+        {
+            /*
+                Change 20.06.2017
 
-		public static bool operator >=(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
-			return compareRes >= 0;
-		}
-		public static bool operator <=(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
-			return compareRes <= 0;
-		}
+                This operator should return false if one or both operands are null
+
+                Example:
+
+                The previous version would return 'true' for expression: (new System.TimeSpan(15,0,0) >  null)
+                Now it returns false. That is now the exactly result which original c# code would return.
+            */
+
+            if (c1.Value == null || c2.Value == null)
+                return false;
+            else
+            {
+                var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
+                return compareRes > 0;
+            }
+        }
+        public static bool operator <(LambdaParameterWrapper c1, LambdaParameterWrapper c2)
+        {
+            /*
+               Change 20.06.2017
+
+               This operator should return false if one or both operands are null
+
+               Example:
+
+               The previous version would return 'true' for expression: (null < new System.TimeSpan(15,0,0))
+               Now it returns false. That is now the exactly result which original c# code would return.
+           */
+
+            if (c1.Value == null || c2.Value == null)
+                return false;
+            else
+            {
+                var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
+                return compareRes < 0;
+            }
+        }
+
+        public static bool operator >=(LambdaParameterWrapper c1, LambdaParameterWrapper c2)
+        {
+            /*
+                Change 20.06.2017
+
+                This operator should return false if one or both operands are null
+
+                Example:
+
+                The previous version would return 'true' for expression: (null >= new System.TimeSpan(15,0,0))
+                Now it returns false. That is now the exactly result which original c# code would return.
+            */
+
+            if (c1.Value == null || c2.Value == null)
+                return false;
+            else
+            {
+                var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
+                return compareRes >= 0;
+            }
+        }
+
+        public static bool operator <=(LambdaParameterWrapper c1, LambdaParameterWrapper c2)
+        {
+            /*
+                 Change 20.06.2017
+
+                 This operator should return false if one or both operands are null
+
+                 Example:
+
+                 The previous version would return 'true' for expression: (null <= new System.TimeSpan(15,0,0))
+                 Now it returns false. That is now the exactly result which original c# code would return.
+            */
+
+            if (c1.Value == null || c2.Value == null)
+                return false;
+            else
+            {
+                var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
+                return compareRes <= 0;
+            }
+        }
 
 		public static LambdaParameterWrapper operator !(LambdaParameterWrapper c1) {
 			var c1bool = Convert.ToBoolean(c1.Value, CultureInfo.InvariantCulture);
