@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NReco.LambdaParser", "NReco
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NReco.LambdaParser.Tests", "NReco.LambdaParser.Tests\NReco.LambdaParser.Tests.csproj", "{7C5C1806-C3A7-494A-9EF0-A6304EBB5BEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NReco.LambdaParser.Portable", "NReco.LambdaParser\NReco.LambdaParser.Portable.csproj", "{2E4066D1-A58E-44BB-AB15-63DF19AADAEF}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -27,14 +27,16 @@ namespace NReco.Linq {
 	/// </summary>
 	internal sealed class LambdaParameterWrapper : IComparable {
 		object _Value;
+		IValueComparer Cmp;
 
 		public object Value {
 			get { return _Value; }
 		}
 
-		public LambdaParameterWrapper(object val) {
+		public LambdaParameterWrapper(object val, IValueComparer valueComparer) {
+			Cmp = valueComparer;
 			if (val is LambdaParameterWrapper)
-				_Value = ((LambdaParameterWrapper)val).Value; // prevent nested wrappers
+				_Value = ((LambdaParameterWrapper)val).Value; // unwrap
 			else if (val is object[]) {
 				var objArr = (object[])val;
 				for (int i=0; i<objArr.Length; i++)
@@ -48,18 +50,19 @@ namespace NReco.Linq {
 
 		public int CompareTo(object obj) {
 			var objResolved = obj is LambdaParameterWrapper ? ((LambdaParameterWrapper)obj).Value : obj;
-			return ValueComparer.Instance.Compare(Value, objResolved);
+			var cmpRes = Cmp.Compare(Value, objResolved);
+			if (!cmpRes.HasValue)
+				throw new ArgumentException();
+			return cmpRes.Value;
 		}
 
 		public bool IsTrue {
 			get {
-				if (_Value==null)
-					return false;
-				return _Value is bool ? (bool)_Value : Convert.ToBoolean(_Value);
+				return Cmp.Compare(Value, true)==0;
 			}
 		}
 
-		public static LambdaParameterWrapper CreateDictionary(object[] keys, object[] values) {
+		public LambdaParameterWrapper CreateDictionary(object[] keys, object[] values) {
 			if (keys.Length!=values.Length)
 				throw new ArgumentException();
 			var d = new Dictionary<object,object>();
@@ -73,10 +76,10 @@ namespace NReco.Linq {
 					v = ((LambdaParameterWrapper)v).Value;
 				d[k] = v;
 			}
-			return new LambdaParameterWrapper(d);
+			return new LambdaParameterWrapper(d, Cmp);
 		}
 
-		public static LambdaParameterWrapper InvokeMethod(object obj, string methodName, object[] args) {
+		public LambdaParameterWrapper InvokeMethod(object obj, string methodName, object[] args) {
 			if (obj is LambdaParameterWrapper)
 				obj = ((LambdaParameterWrapper)obj).Value;
 
@@ -89,10 +92,10 @@ namespace NReco.Linq {
 
 			var invoke = new InvokeMethod(obj, methodName);
 			var res = invoke.Invoke(argsResolved);
-			return new LambdaParameterWrapper(res);
+			return new LambdaParameterWrapper(res, Cmp);
 		}
 
-		public static LambdaParameterWrapper InvokeDelegate(object obj, object[] args) {
+		public LambdaParameterWrapper InvokeDelegate(object obj, object[] args) {
 			if (obj is LambdaParameterWrapper)
 				obj = ((LambdaParameterWrapper)obj).Value;
 			if (obj == null)
@@ -119,10 +122,10 @@ namespace NReco.Linq {
 					System.Globalization.CultureInfo.InvariantCulture
 				);
 			}
-			return new LambdaParameterWrapper( deleg.DynamicInvoke(resolvedArgs) );
+			return new LambdaParameterWrapper( deleg.DynamicInvoke(resolvedArgs), Cmp );
 		}
 
-		public static LambdaParameterWrapper InvokePropertyOrField(object obj, string propertyName) {
+		public LambdaParameterWrapper InvokePropertyOrField(object obj, string propertyName) {
 			if (obj == null)
 				throw new NullReferenceException(String.Format("Property or field {0} target is null", propertyName));
 			if (obj is LambdaParameterWrapper)
@@ -136,7 +139,7 @@ namespace NReco.Linq {
 
 			if (prop != null) {
 				var propVal = prop.GetValue(obj, null);
-				return new LambdaParameterWrapper(propVal);
+				return new LambdaParameterWrapper(propVal, Cmp);
 			}
 			#if NET40
 			var fld = obj.GetType().GetField(propertyName);
@@ -145,12 +148,12 @@ namespace NReco.Linq {
 			#endif
 			if (fld != null) {
 				var fldVal = fld.GetValue(obj);
-				return new LambdaParameterWrapper(fldVal);
+				return new LambdaParameterWrapper(fldVal, Cmp);
 			}
 			throw new MissingMemberException(obj.GetType().ToString()+"."+propertyName);
 		}
 
-		public static LambdaParameterWrapper InvokeIndexer(object obj, object[] args) {
+		public LambdaParameterWrapper InvokeIndexer(object obj, object[] args) {
 			if (obj == null)
 				throw new NullReferenceException(String.Format("Indexer target is null"));
 			if (obj is LambdaParameterWrapper)
@@ -171,108 +174,98 @@ namespace NReco.Linq {
 					indicies[i] = Convert.ToInt32(argsResolved[i]);
 
 				var res = objArr.GetValue(indicies);
-				return new LambdaParameterWrapper(res);
+				return new LambdaParameterWrapper(res, Cmp);
 			} else {
 				// indexer method
 				var invoke = new InvokeMethod(obj, "get_Item");
 				var res = invoke.Invoke(argsResolved);
-				return new LambdaParameterWrapper(res);
+				return new LambdaParameterWrapper(res, Cmp);
 			}
 		}
 
 		public static LambdaParameterWrapper operator +(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
 			if (c1.Value is string || c2.Value is string) {
-				return new LambdaParameterWrapper( Convert.ToString(c1.Value) + Convert.ToString(c2.Value));
+				return new LambdaParameterWrapper( Convert.ToString(c1.Value) + Convert.ToString(c2.Value), c1.Cmp);
 			} else {
 				var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
 				var c2decimal = Convert.ToDecimal(c2.Value,  CultureInfo.InvariantCulture);
-				return new LambdaParameterWrapper(c1decimal + c2decimal);
+				return new LambdaParameterWrapper(c1decimal + c2decimal, c1.Cmp);
 			}
 		}
 
 		public static LambdaParameterWrapper operator -(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
 			var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
 			var c2decimal = Convert.ToDecimal(c2.Value, CultureInfo.InvariantCulture);
-			return new LambdaParameterWrapper(c1decimal - c2decimal);
+			return new LambdaParameterWrapper(c1decimal - c2decimal, c1.Cmp);
 		}
 
 		public static LambdaParameterWrapper operator -(LambdaParameterWrapper c1) {
 			var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
-			return new LambdaParameterWrapper(-c1decimal);
+			return new LambdaParameterWrapper(-c1decimal, c1.Cmp);
 		}
 
 		public static LambdaParameterWrapper operator *(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
 			var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
 			var c2decimal = Convert.ToDecimal(c2.Value, CultureInfo.InvariantCulture);
-			return new LambdaParameterWrapper(c1decimal * c2decimal);
+			return new LambdaParameterWrapper(c1decimal * c2decimal, c1.Cmp);
 		}
 
 		public static LambdaParameterWrapper operator /(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
 			var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
 			var c2decimal = Convert.ToDecimal(c2.Value, CultureInfo.InvariantCulture);
-			return new LambdaParameterWrapper(c1decimal / c2decimal);
+			return new LambdaParameterWrapper(c1decimal / c2decimal, c1.Cmp);
 		}
 
 		public static LambdaParameterWrapper operator %(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
 			var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
 			var c2decimal = Convert.ToDecimal(c2.Value, CultureInfo.InvariantCulture);
-			return new LambdaParameterWrapper(c1decimal % c2decimal);
+			return new LambdaParameterWrapper(c1decimal % c2decimal, c1.Cmp);
 		}
 
 		public static bool operator ==(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
-			return compareRes == 0;
+			return c1.Cmp.Compare(c1.Value, c2.Value)==0;
 		}
 		public static bool operator ==(LambdaParameterWrapper c1, bool c2) {
-			var c1bool = Convert.ToBoolean(c1.Value, CultureInfo.InvariantCulture);
-			return c1bool == c2;
+			return c1.Cmp.Compare(c1.Value, c2)==0;
 		}
 		public static bool operator ==(bool c1, LambdaParameterWrapper c2) {
-			var c2bool = Convert.ToBoolean(c2.Value, CultureInfo.InvariantCulture);
-			return c1==c2bool;
+			return c2.Cmp.Compare(c1, c2.Value)==0;
 		}
 
 		public static bool operator !=(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
-			return compareRes != 0;
+			return c1.Cmp.Compare(c1.Value, c2.Value)!=0;
 		}
 		public static bool operator !=(LambdaParameterWrapper c1, bool c2) {
-			var c1bool = Convert.ToBoolean(c1.Value, CultureInfo.InvariantCulture);
-			return c1bool != c2;
+			return c1.Cmp.Compare(c1.Value, c2)!=0;
 		}
 		public static bool operator !=(bool c1, LambdaParameterWrapper c2) {
-			var c2bool = Convert.ToBoolean(c2.Value, CultureInfo.InvariantCulture);
-			return c1 != c2bool;
+			return c2.Cmp.Compare(c1, c2.Value)!=0;
 		}
 
 		public static bool operator >(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
-			return compareRes>0;
+			return c1.Cmp.Compare(c1.Value, c2.Value)>0;
 		}
 		public static bool operator <(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
-			return compareRes < 0;
+			return c1.Cmp.Compare(c1.Value, c2.Value) < 0;
 		}
 
 		public static bool operator >=(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
-			return compareRes >= 0;
+			return c1.Cmp.Compare(c1.Value, c2.Value)>= 0;
 		}
 		public static bool operator <=(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			var compareRes = ValueComparer.Instance.Compare(c1.Value, c2.Value);
-			return compareRes <= 0;
+			return c1.Cmp.Compare(c1.Value, c2.Value)<=0;
 		}
 
 		public static LambdaParameterWrapper operator !(LambdaParameterWrapper c1) {
-			var c1bool = Convert.ToBoolean(c1.Value, CultureInfo.InvariantCulture);
-			return new LambdaParameterWrapper( !c1bool );
+			var c1bool = c1.Cmp.Compare(c1.Value, true)==0;
+			return new LambdaParameterWrapper( !c1bool, c1.Cmp);
 		}
 
 		public static LambdaParameterWrapper operator &(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			return  new LambdaParameterWrapper( c1.IsTrue && c2.IsTrue );
+			return  new LambdaParameterWrapper( c1.IsTrue && c2.IsTrue, c1.Cmp);
 		}
 		public static LambdaParameterWrapper operator &(LambdaParameterWrapper c1, bool c2) {
-			return new LambdaParameterWrapper( c1.IsTrue && c2 );
+			return new LambdaParameterWrapper( c1.IsTrue && c2, c1.Cmp);
 		}
 		public static bool operator &(bool c1, LambdaParameterWrapper c2) {
 			return c1 && c2.IsTrue;
@@ -282,10 +275,10 @@ namespace NReco.Linq {
 		}
 
 		public static LambdaParameterWrapper operator |(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			return new LambdaParameterWrapper( c1.IsTrue || Convert.ToBoolean(c2.Value,CultureInfo.InvariantCulture) );
+			return new LambdaParameterWrapper( c1.IsTrue || Convert.ToBoolean(c2.Value,CultureInfo.InvariantCulture), c1.Cmp );
 		}
 		public static LambdaParameterWrapper operator |(LambdaParameterWrapper c1, bool c2) {
-			return new LambdaParameterWrapper( c1.IsTrue || c2 );
+			return new LambdaParameterWrapper( c1.IsTrue || c2, c1.Cmp );
 		}
 		public static bool operator |(bool c1, LambdaParameterWrapper c2) {
 			return c1 || c2.IsTrue;

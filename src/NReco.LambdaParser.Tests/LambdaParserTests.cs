@@ -7,7 +7,7 @@ using NUnit.Framework;
 using NReco;
 using NReco.Linq;
 
-namespace NReco.Tests.Linq {
+namespace NReco.Linq.Tests {
 
 	[TestFixture]
 	public class LambdaParserTests {
@@ -96,8 +96,14 @@ namespace NReco.Tests.Linq {
 			Assert.IsFalse( (bool) lambdaParser.Eval("!Yes", varContext ) );
 
 			Assert.IsTrue( (bool) lambdaParser.Eval("null == nullVar", varContext ) );
+			Assert.IsTrue((bool)lambdaParser.Eval("5>nullVar", varContext));
 			Assert.IsTrue( (bool) lambdaParser.Eval("testObj!=null", varContext ) );
 			Assert.AreEqual(0, LambdaParser.GetExpressionParameters(lambdaParser.Parse("20 == null")).Length );
+
+			lambdaParser = new LambdaParser(new ValueComparer() { NullComparison = ValueComparer.NullComparisonMode.Sql });
+			Assert.IsFalse((bool)lambdaParser.Eval("null == nullVar", varContext));
+			Assert.IsFalse((bool)lambdaParser.Eval("nullVar<5", varContext));
+			Assert.IsFalse((bool)lambdaParser.Eval("nullVar>5", varContext));
 		}
 
 		[Test]

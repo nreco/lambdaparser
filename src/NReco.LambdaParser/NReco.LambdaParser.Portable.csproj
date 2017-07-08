@@ -43,11 +43,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="InvokeMethod.cs" />
+    <Compile Include="Linq\IValueComparer.cs" />
     <Compile Include="Linq\LambdaParameterWrapper.cs" />
     <Compile Include="Linq\LambdaParser.cs" />
     <Compile Include="Linq\LambdaParserException.cs" />
+    <Compile Include="Linq\ValueComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ValueComparer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

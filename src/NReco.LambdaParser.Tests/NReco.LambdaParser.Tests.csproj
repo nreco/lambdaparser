@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="LambdaParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ValueComparerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NReco.LambdaParser\NReco.LambdaParser.Portable.csproj">
