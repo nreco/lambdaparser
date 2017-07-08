@@ -49,7 +49,7 @@ namespace NReco.Linq {
 		/// <summary>
 		/// Gets value comparer used by the parser for comparison operators.
 		/// </summary>
-		public IValueComparer Comparer { get; }
+		public IValueComparer Comparer { get; private set; }
 
 		public LambdaParser() {
 			UseCache = true;
