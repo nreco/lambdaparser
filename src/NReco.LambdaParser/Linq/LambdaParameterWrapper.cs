@@ -287,6 +287,11 @@ namespace NReco.Linq {
 			return !x.IsTrue;
 		}
 
+		public override string ToString()
+		{
+			return $"{Value}";
+		}
+
 	}
 
 }
