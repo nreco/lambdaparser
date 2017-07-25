@@ -25,7 +25,7 @@ namespace NReco.Linq {
 	/// <summary>
 	/// This is wrapper that makes runtime types conversions real.
 	/// </summary>
-	internal sealed class LambdaParameterWrapper : IComparable {
+	public sealed partial class LambdaParameterWrapper : IComparable {
 		object _Value;
 		IValueComparer Cmp;
 
@@ -285,11 +285,6 @@ namespace NReco.Linq {
 		}
 		public static bool operator false(LambdaParameterWrapper x) {
 			return !x.IsTrue;
-		}
-
-		public override string ToString()
-		{
-			return $"{Value}";
 		}
 
 	}
