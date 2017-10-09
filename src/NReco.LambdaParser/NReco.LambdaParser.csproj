@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Runtime parser for string expressions (formulas, method calls etc). Builds LINQ expression tree and compiles it to lambda delegate, supports dynamically typed variables.</Description>
+    <Description>Runtime expressions parser and evaluator (formulas, conditions, method calls, properties/indexers etc). Builds LINQ expression tree and compiles it to lambda delegate with full support of dynamically typed variables.</Description>
+	<Title>Dynamic expressions evaluator</Title>
     <Copyright>Copyright (c) 2013-2017 Vitalii Fedorchenko</Copyright>
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
     <VersionPrefix>1.0.7</VersionPrefix>
@@ -19,7 +20,7 @@
     <SignAssembly>false</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>NReco.LambdaParser</PackageId>
-    <PackageTags>LambdaParser;Formula;Expression;Parser;Math;Evaluator;Eval;PCL;netstandard;netcore;net40;net45;WindowsPhone8;Silverlight</PackageTags>
+    <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;PCL;netstandard;netcore;net40;net45;WindowsPhone8;Silverlight</PackageTags>
     <PackageIconUrl>https://www.nrecosite.com/img/nreco-logo-200.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/nreco/lambdaparser</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/nreco/lambdaparser/master/LICENSE</PackageLicenseUrl>
