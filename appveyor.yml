@@ -1,5 +1,5 @@
 version: 1.0.{build}
-os: Visual Studio 2013
+os: Visual Studio 2017
 
 branches:
   only:
@@ -8,11 +8,11 @@ branches:
 skip_tags: true
 
 install:
-- cmd: nuget restore src\NReco.LambdaParser.Portable.sln
+- cmd: dotnet restore src\NReco.LambdaParser.sln
 
-build:
-  project: src\NReco.LambdaParser.Portable.sln
-  verbosity: minimal
+build_script:
+- cmd: dotnet build src\NReco.LambdaParser --configuration Release
+- cmd: dotnet build src\NReco.LambdaParser.Tests --configuration Release
 
 test_script:
-- cmd: nunit-console src\NReco.LambdaParser.Tests\bin\Debug\NReco.LambdaParser.Tests.dll
+- cmd: dotnet test src\NReco.LambdaParser.Tests\NReco.LambdaParser.Tests.csproj --configuration Release

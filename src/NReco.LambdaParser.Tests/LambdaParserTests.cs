@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Diagnostics;
 using System.Text;
-using NUnit.Framework;
-using NReco;
-using NReco.Linq;
+
+using Xunit;
 
 namespace NReco.Linq.Tests {
 
-	[TestFixture]
 	public class LambdaParserTests {
 
-		[Test]
+		[Fact]
 		public void Eval() {
 			var lambdaParser = new LambdaParser();
 
@@ -30,83 +28,83 @@ namespace NReco.Linq.Tests {
 			varContext["name_with_underscore"] = "a_b";
 			varContext["_name_with_underscore"] = "_a_b";
 
-			Assert.AreEqual("st", lambdaParser.Eval("test.Substring(2)", varContext ) );
+			Assert.Equal("st", lambdaParser.Eval("test.Substring(2)", varContext ) );
 
-			Assert.AreEqual(3, lambdaParser.Eval("1+2", varContext) );
-			Assert.AreEqual(6, lambdaParser.Eval("1+2+3", varContext));
-			Assert.AreEqual("b{0}_", lambdaParser.Eval("\"b{0}_\"", varContext));
+			Assert.Equal(3M, lambdaParser.Eval("1+2", varContext) );
+			Assert.Equal(6M, lambdaParser.Eval("1+2+3", varContext));
+			Assert.Equal("b{0}_", lambdaParser.Eval("\"b{0}_\"", varContext));
 
-			Assert.AreEqual(3, lambdaParser.Eval("(1+(3-1)*4)/3", varContext));
+			Assert.Equal(3M, lambdaParser.Eval("(1+(3-1)*4)/3", varContext));
 			
-			Assert.AreEqual(1, lambdaParser.Eval("one*5*one-(-1+5*5%10)", varContext));
+			Assert.Equal(1M, lambdaParser.Eval("one*5*one-(-1+5*5%10)", varContext));
 
-			Assert.AreEqual("ab", lambdaParser.Eval("\"a\"+\"b\"", varContext));
+			Assert.Equal("ab", lambdaParser.Eval("\"a\"+\"b\"", varContext));
 
-			Assert.AreEqual(4.14, lambdaParser.Eval("pi + 1", varContext) );
+			Assert.Equal(4.14M, lambdaParser.Eval("pi + 1", varContext) );
 
-			Assert.AreEqual(5.14, lambdaParser.Eval("2 +pi", varContext) );
+			Assert.Equal(5.14M, lambdaParser.Eval("2 +pi", varContext) );
 
-			Assert.AreEqual(2.14, lambdaParser.Eval("pi + -one", varContext) );
+			Assert.Equal(2.14M, lambdaParser.Eval("pi + -one", varContext) );
 
-			Assert.AreEqual("test1", lambdaParser.Eval("test + \"1\"", varContext) );
+			Assert.Equal("test1", lambdaParser.Eval("test + \"1\"", varContext) );
 
-			Assert.AreEqual("a_b_a_b", lambdaParser.Eval(" name_with_underscore + _name_with_underscore ", varContext));
+			Assert.Equal("a_b_a_b", lambdaParser.Eval(" name_with_underscore + _name_with_underscore ", varContext));
 
-			Assert.AreEqual(1, lambdaParser.Eval("true or false ? 1 : 0", varContext) );
+			Assert.Equal(1M, lambdaParser.Eval("true or false ? 1 : 0", varContext) );
 
-			Assert.AreEqual(true, lambdaParser.Eval("5<=3 ? false : true", varContext));
+			Assert.Equal(true, lambdaParser.Eval("5<=3 ? false : true", varContext));
 
-			Assert.AreEqual(5, lambdaParser.Eval("pi>one && 0<one ? (1+8)/3+1*two : 0", varContext));
+			Assert.Equal(5M, lambdaParser.Eval("pi>one && 0<one ? (1+8)/3+1*two : 0", varContext));
 
-			Assert.AreEqual(4, lambdaParser.Eval("pi>0 ? one+two+one : 0", varContext));
+			Assert.Equal(4M, lambdaParser.Eval("pi>0 ? one+two+one : 0", varContext));
 
-			Assert.AreEqual(DateTime.Now.Year, lambdaParser.Eval("now.Year", varContext) );
+			Assert.Equal(DateTime.Now.Year, lambdaParser.Eval("now.Year", varContext) );
 
-			Assert.AreEqual(true, lambdaParser.Eval(" (1+testObj.IntProp)==2 ? testObj.FldTrue : false ", varContext));
+			Assert.Equal(true, lambdaParser.Eval(" (1+testObj.IntProp)==2 ? testObj.FldTrue : false ", varContext));
 
-			Assert.AreEqual("ab2_3", lambdaParser.Eval(" \"a\"+testObj.Format(\"b{0}_{1}\", 2, \"3\".ToString() ).ToString() ", varContext));
+			Assert.Equal("ab2_3", lambdaParser.Eval(" \"a\"+testObj.Format(\"b{0}_{1}\", 2, \"3\".ToString() ).ToString() ", varContext));
 
-			Assert.AreEqual(true, lambdaParser.Eval(" testObj.Hash[\"a\"] == \"1\"", varContext));
+			Assert.Equal(true, lambdaParser.Eval(" testObj.Hash[\"a\"] == \"1\"", varContext));
 			
-			Assert.AreEqual(true, lambdaParser.Eval(" (testObj.Hash[\"a\"]-1)==testObj.Hash[\"b\"].Length ", varContext));
+			Assert.Equal(true, lambdaParser.Eval(" (testObj.Hash[\"a\"]-1)==testObj.Hash[\"b\"].Length ", varContext));
 
-			Assert.AreEqual(4.0, lambdaParser.Eval(" arr1[0]+arr1[1] ", varContext));
+			Assert.Equal(4.0M, lambdaParser.Eval(" arr1[0]+arr1[1] ", varContext));
 
-			Assert.AreEqual(2, lambdaParser.Eval(" (new[]{1,2})[1] ", varContext));
+			Assert.Equal(2M, lambdaParser.Eval(" (new[]{1,2})[1] ", varContext));
 
-			Assert.AreEqual(true, lambdaParser.Eval(" new[]{ one } == new[] { 1 } ", varContext));
+			Assert.Equal(true, lambdaParser.Eval(" new[]{ one } == new[] { 1 } ", varContext));
 
-			Assert.AreEqual(3, lambdaParser.Eval(" new dictionary{ {\"a\", 1}, {\"b\", 2}, {\"c\", 3} }.Count ", varContext));
+			Assert.Equal(3, lambdaParser.Eval(" new dictionary{ {\"a\", 1}, {\"b\", 2}, {\"c\", 3} }.Count ", varContext));
 
-			Assert.AreEqual(2, lambdaParser.Eval(" new dictionary{ {\"a\", 1}, {\"b\", 2}, {\"c\", 3} }[\"b\"] ", varContext));
+			Assert.Equal(2M, lambdaParser.Eval(" new dictionary{ {\"a\", 1}, {\"b\", 2}, {\"c\", 3} }[\"b\"] ", varContext));
 
 			var arr = ((Array)lambdaParser.Eval(" new []{ new dictionary{{\"test\",2}}, new[] { one } }", varContext) );
-			Assert.AreEqual(2, ((IDictionary)arr.GetValue(0) )["test"] );
-			Assert.AreEqual(1, ((Array)arr.GetValue(1) ).GetValue(0) );
+			Assert.Equal(2M, ((IDictionary)arr.GetValue(0) )["test"] );
+			Assert.Equal(1M, ((Array)arr.GetValue(1) ).GetValue(0) );
 
-			Assert.AreEqual("str", lambdaParser.Eval(" testObj.GetDelegNoParam()() ", varContext));
-			Assert.AreEqual("zzz", lambdaParser.Eval(" testObj.GetDelegOneParam()(\"zzz\") ", varContext));
+			Assert.Equal("str", lambdaParser.Eval(" testObj.GetDelegNoParam()() ", varContext));
+			Assert.Equal("zzz", lambdaParser.Eval(" testObj.GetDelegOneParam()(\"zzz\") ", varContext));
 
-			Assert.AreEqual(false, lambdaParser.Eval("(testObj.FldTrue and false) || (testObj.FldTrue && false)", varContext ) );
-			Assert.AreEqual(true, lambdaParser.Eval("false or testObj.FldTrue", varContext ) );
-			Assert.AreEqual("True", lambdaParser.Eval("testObj.BoolParam(true)", varContext ) );
+			Assert.Equal(false, lambdaParser.Eval("(testObj.FldTrue and false) || (testObj.FldTrue && false)", varContext ) );
+			Assert.Equal(true, lambdaParser.Eval("false or testObj.FldTrue", varContext ) );
+			Assert.Equal("True", lambdaParser.Eval("testObj.BoolParam(true)", varContext ) );
 
-			Assert.IsTrue( (bool) lambdaParser.Eval("true && NOT( false )", varContext ) );
-			Assert.IsTrue( (bool) lambdaParser.Eval("true && !( false )", varContext ) );
-			Assert.IsFalse( (bool) lambdaParser.Eval("!Yes", varContext ) );
+			Assert.True( (bool) lambdaParser.Eval("true && NOT( false )", varContext ) );
+			Assert.True( (bool) lambdaParser.Eval("true && !( false )", varContext ) );
+			Assert.False( (bool) lambdaParser.Eval("!Yes", varContext ) );
 
-			Assert.IsTrue( (bool) lambdaParser.Eval("null == nullVar", varContext ) );
-			Assert.IsTrue((bool)lambdaParser.Eval("5>nullVar", varContext));
-			Assert.IsTrue( (bool) lambdaParser.Eval("testObj!=null", varContext ) );
-			Assert.AreEqual(0, LambdaParser.GetExpressionParameters(lambdaParser.Parse("20 == null")).Length );
+			Assert.True( (bool) lambdaParser.Eval("null == nullVar", varContext ) );
+			Assert.True((bool)lambdaParser.Eval("5>nullVar", varContext));
+			Assert.True( (bool) lambdaParser.Eval("testObj!=null", varContext ) );
+			Assert.Equal(0, LambdaParser.GetExpressionParameters(lambdaParser.Parse("20 == null")).Length );
 
 			lambdaParser = new LambdaParser(new ValueComparer() { NullComparison = ValueComparer.NullComparisonMode.Sql });
-			Assert.IsFalse((bool)lambdaParser.Eval("null == nullVar", varContext));
-			Assert.IsFalse((bool)lambdaParser.Eval("nullVar<5", varContext));
-			Assert.IsFalse((bool)lambdaParser.Eval("nullVar>5", varContext));
+			Assert.False((bool)lambdaParser.Eval("null == nullVar", varContext));
+			Assert.False((bool)lambdaParser.Eval("nullVar<5", varContext));
+			Assert.False((bool)lambdaParser.Eval("nullVar>5", varContext));
 		}
 
-		[Test]
+		[Fact]
 		public void EvalCachePerf() {
 			var lambdaParser = new LambdaParser();
 
@@ -118,7 +116,7 @@ namespace NReco.Linq.Tests {
 			sw.Start();
 			for (int i = 0; i < 10000; i++) {
 
-				Assert.AreEqual(105, lambdaParser.Eval("(a*2 + 100)/b", varContext));
+				Assert.Equal(105M, lambdaParser.Eval("(a*2 + 100)/b", varContext));
 			}
 			sw.Stop();
 			Console.WriteLine("10000 iterations: {0}", sw.Elapsed);

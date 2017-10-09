@@ -6,7 +6,13 @@
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
     <VersionPrefix>1.0.6</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
-    <TargetFrameworks>portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8;netstandard1.3</TargetFrameworks>
+	
+	<!-- .NET Core SDK 2.0 / lastest VS 2017 cannot build old PCL targets for unknown reason. -->
+	<TargetFramework>netstandard1.3</TargetFramework>
+    
+	<!-- Full list of targets is used only for building nuget package with CLI (SDK 1.0 still able do that) -->
+	<!--TargetFrameworks>netstandard1.3;portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8</TargetFrameworks-->
+	
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>NReco.LambdaParser</AssemblyName>
     <AssemblyOriginatorKeyFile>NReco.LambdaParser.snk</AssemblyOriginatorKeyFile>
@@ -27,6 +33,7 @@
     <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+	
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'portable45-net45+win8+wp8+wpa81' ">
