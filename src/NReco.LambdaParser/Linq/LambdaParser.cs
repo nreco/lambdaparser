@@ -226,6 +226,12 @@ namespace NReco.Linq {
 			return testExpr;
 		}
 
+		Expression WrapLambdaParameterIsTrueIfNeeded(Expression expr) {
+			if (expr.Type == typeof(LambdaParameterWrapper))
+				return Expression.Property(expr, "IsTrue");
+			return expr;
+		}
+
 		protected ParseResult ParseOr(string expr, int start) {
 			var firstOp = ParseAnd(expr, start);
 			do {
@@ -243,7 +249,9 @@ namespace NReco.Linq {
 					var secondOp = ParseOr(expr, opLexem.End);
 					firstOp = new ParseResult() {
 						End = secondOp.End,
-						Expr = Expression.OrElse(firstOp.Expr, secondOp.Expr)
+						Expr = Expression.OrElse( 
+							WrapLambdaParameterIsTrueIfNeeded(firstOp.Expr), 
+							WrapLambdaParameterIsTrueIfNeeded(secondOp.Expr) )
 					};
 				} else
 					break;
@@ -268,7 +276,9 @@ namespace NReco.Linq {
 					var secondOp = ParseAnd(expr, opLexem.End);
 					firstOp = new ParseResult() {
 						End = secondOp.End,
-						Expr = Expression.AndAlso(firstOp.Expr, secondOp.Expr)
+						Expr = Expression.AndAlso(
+									WrapLambdaParameterIsTrueIfNeeded(firstOp.Expr),
+									WrapLambdaParameterIsTrueIfNeeded(secondOp.Expr))
 					};
 				} else
 					break;

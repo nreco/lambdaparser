@@ -10,11 +10,8 @@ namespace NReco.Linq.Tests {
 
 	public class LambdaParserTests {
 
-		[Fact]
-		public void Eval() {
-			var lambdaParser = new LambdaParser();
-
-			var varContext = new Dictionary<string,object>();
+		Dictionary<string,object> getContext() {
+			var varContext = new Dictionary<string, object>();
 			varContext["pi"] = 3.14M;
 			varContext["one"] = 1M;
 			varContext["two"] = 2M;
@@ -22,11 +19,19 @@ namespace NReco.Linq.Tests {
 			varContext["now"] = DateTime.Now;
 			varContext["testObj"] = new TestClass();
 			varContext["arr1"] = new double[] { 1.5, 2.5 };
-			varContext["NOT"] = (Func<bool,bool>)( (t) => !t );
+			varContext["NOT"] = (Func<bool, bool>)((t) => !t);
 			varContext["Yes"] = true;
 			varContext["nullVar"] = null;
 			varContext["name_with_underscore"] = "a_b";
 			varContext["_name_with_underscore"] = "_a_b";
+			return varContext;
+		}
+
+		[Fact]
+		public void Eval() {
+			var lambdaParser = new LambdaParser();
+
+			var varContext = getContext();
 
 			Assert.Equal("st", lambdaParser.Eval("test.Substring(2)", varContext ) );
 
@@ -93,10 +98,19 @@ namespace NReco.Linq.Tests {
 			Assert.True( (bool) lambdaParser.Eval("true && !( false )", varContext ) );
 			Assert.False( (bool) lambdaParser.Eval("!Yes", varContext ) );
 
-			Assert.True( (bool) lambdaParser.Eval("null == nullVar", varContext ) );
+			Assert.True((bool)lambdaParser.Eval("5>two && (5>7 || test.Contains(\"t\") )", varContext));
+			Assert.True((bool)lambdaParser.Eval("null!=test && test!=null && test.Contains(\"t\") && true == Yes && false==!Yes && false!=Yes", varContext));
+		}
+
+		[Fact]
+		public void NullComparison() {
+			var varContext = getContext();
+			var lambdaParser = new LambdaParser();
+
+			Assert.True((bool)lambdaParser.Eval("null == nullVar", varContext));
 			Assert.True((bool)lambdaParser.Eval("5>nullVar", varContext));
-			Assert.True( (bool) lambdaParser.Eval("testObj!=null", varContext ) );
-			Assert.Equal(0, LambdaParser.GetExpressionParameters(lambdaParser.Parse("20 == null")).Length );
+			Assert.True((bool)lambdaParser.Eval("testObj!=null", varContext));
+			Assert.Equal(0, LambdaParser.GetExpressionParameters(lambdaParser.Parse("20 == null")).Length);
 
 			lambdaParser = new LambdaParser(new ValueComparer() { NullComparison = ValueComparer.NullComparisonMode.Sql });
 			Assert.False((bool)lambdaParser.Eval("null == nullVar", varContext));

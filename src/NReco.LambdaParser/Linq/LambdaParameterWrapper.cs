@@ -261,28 +261,10 @@ namespace NReco.Linq {
 			return new LambdaParameterWrapper( !c1bool, c1.Cmp);
 		}
 
-		public static LambdaParameterWrapper operator &(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			return  new LambdaParameterWrapper( c1.IsTrue && c2.IsTrue, c1.Cmp);
-		}
-		public static LambdaParameterWrapper operator &(LambdaParameterWrapper c1, bool c2) {
-			return new LambdaParameterWrapper( c1.IsTrue && c2, c1.Cmp);
-		}
-		public static bool operator &(bool c1, LambdaParameterWrapper c2) {
-			return c1 && c2.IsTrue;
-		}
 		public static bool operator true(LambdaParameterWrapper x) {
 			return x.IsTrue;
 		}
 
-		public static LambdaParameterWrapper operator |(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			return new LambdaParameterWrapper( c1.IsTrue || Convert.ToBoolean(c2.Value,CultureInfo.InvariantCulture), c1.Cmp );
-		}
-		public static LambdaParameterWrapper operator |(LambdaParameterWrapper c1, bool c2) {
-			return new LambdaParameterWrapper( c1.IsTrue || c2, c1.Cmp );
-		}
-		public static bool operator |(bool c1, LambdaParameterWrapper c2) {
-			return c1 || c2.IsTrue;
-		}
 		public static bool operator false(LambdaParameterWrapper x) {
 			return !x.IsTrue;
 		}

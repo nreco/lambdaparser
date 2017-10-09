@@ -4,7 +4,7 @@
     <Description>Runtime parser for string expressions (formulas, method calls etc). Builds LINQ expression tree and compiles it to lambda delegate, supports dynamically typed variables.</Description>
     <Copyright>Copyright (c) 2013-2017 Vitalii Fedorchenko</Copyright>
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
-    <VersionPrefix>1.0.6</VersionPrefix>
+    <VersionPrefix>1.0.7</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
 	
 	<!-- .NET Core SDK 2.0 / lastest VS 2017 cannot build old PCL targets for unknown reason. -->
