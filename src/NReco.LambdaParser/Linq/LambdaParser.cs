@@ -498,6 +498,7 @@ namespace NReco.Linq {
 								InvokeDelegateMI, 
 								val.Expr, paramsExpr)
 						};
+						continue;
 					}
 				}
 				break;

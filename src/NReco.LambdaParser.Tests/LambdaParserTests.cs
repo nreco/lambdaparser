@@ -18,6 +18,7 @@ namespace NReco.Linq.Tests {
 			varContext["test"] = "test";
 			varContext["now"] = DateTime.Now;
 			varContext["testObj"] = new TestClass();
+			varContext["getTestObj"] = (Func<TestClass>)(() => new TestClass());
 			varContext["arr1"] = new double[] { 1.5, 2.5 };
 			varContext["NOT"] = (Func<bool, bool>)((t) => !t);
 			varContext["Yes"] = true;
@@ -93,6 +94,7 @@ namespace NReco.Linq.Tests {
 			Assert.Equal(false, lambdaParser.Eval("(testObj.FldTrue and false) || (testObj.FldTrue && false)", varContext ) );
 			Assert.Equal(true, lambdaParser.Eval("false or testObj.FldTrue", varContext ) );
 			Assert.Equal("True", lambdaParser.Eval("testObj.BoolParam(true)", varContext ) );
+			Assert.Equal("True", lambdaParser.Eval("getTestObj().BoolParam(true)", varContext));
 
 			Assert.True( (bool) lambdaParser.Eval("true && NOT( false )", varContext ) );
 			Assert.True( (bool) lambdaParser.Eval("true && !( false )", varContext ) );
