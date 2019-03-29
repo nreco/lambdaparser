@@ -79,41 +79,18 @@ namespace NReco.Linq {
 			return paramsVisitor.ParamsList.ToArray();
 		}
 
-		public Func<object> CreateDelegate(string expr, IDictionary<string, Func<object>> varGetters)
-		{
-			return () => Eval(expr, varGetters, true);
-		}
-
-		public Func<object> CreateDelegate(string expr, IDictionary<string, object> vars)
-		{
-			return () => Eval(expr, vars, true);
-		}
-
-		public Func<object> CreateDelegate(string expr, Func<string,object> getVarValue)
-		{
-			return () => Eval(expr, getVarValue, true);
-		}
-
-		public object Eval(string expr, IDictionary<string, Func<object>> vars, bool? useCache = null) {
-			return Eval(expr, (varName) => {
-				Func<object> val = null;
-				vars.TryGetValue(varName, out val);
-				return val?.Invoke();
-			}, useCache);
-		}
-
-		public object Eval(string expr, IDictionary<string, object> vars, bool? useCache = null) {
+		public object Eval(string expr, IDictionary<string, object> vars) {
 			return Eval(expr, (varName) => {
 				object val = null;
 				vars.TryGetValue(varName, out val);
 				return val;
-			}, useCache);
+			});
 		}
 
-		public object Eval(string expr, Func<string,object> getVarValue, bool? useCache = null) {
+		public object Eval(string expr, Func<string,object> getVarValue) {
 			CompiledExpression compiledExpr = null;
 
-			if (useCache ?? UseCache) {
+			if (UseCache) {
 				lock (_lock) {
 					CachedExpressions.TryGetValue(expr, out compiledExpr);
 				}
@@ -127,7 +104,7 @@ namespace NReco.Linq {
 				var lambdaExpr = Expression.Lambda(linqExpr, compiledExpr.Parameters);
 				compiledExpr.Lambda = lambdaExpr.Compile();
 				
-				if (useCache ?? UseCache)
+				if (UseCache)
 					lock (_lock) {
 						CachedExpressions[expr] = compiledExpr;
 					}
