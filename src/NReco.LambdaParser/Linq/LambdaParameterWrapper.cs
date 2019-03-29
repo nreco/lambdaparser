@@ -188,11 +188,19 @@ namespace NReco.Linq {
 				return new LambdaParameterWrapper( Convert.ToString(c1.Value) + Convert.ToString(c2.Value), c1.Cmp);
 			} 
 
-			if (c1.Value is TimeSpan || c2.Value is TimeSpan)
+			if (c1.Value is TimeSpan c1TimeSpan && c2.Value is DateTime c2DateTime) 
             {
-                var c1TimeSpan = c1.Value as TimeSpan?;
-                var c2TimeSpan = c2.Value as TimeSpan?;
-                return new LambdaParameterWrapper(c1TimeSpan + c2TimeSpan, c1.Cmp);
+                return new LambdaParameterWrapper(c2DateTime.Add(c1TimeSpan), c1.Cmp);
+            }
+
+			if (c1.Value is DateTime c1DateTime && c2.Value is TimeSpan c2TimeSpan) 
+            {
+                return new LambdaParameterWrapper(c1DateTime.Add(c2TimeSpan), c1.Cmp);
+            }
+
+			if (c1.Value is TimeSpan c1ts && c2.Value is TimeSpan c2ts)
+            {
+                return new LambdaParameterWrapper(c1ts + c2ts, c1.Cmp);
             }
 
 			var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
@@ -201,18 +209,19 @@ namespace NReco.Linq {
 		}
 
 		public static LambdaParameterWrapper operator -(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
-			if (c1.Value is DateTime || c2.Value is DateTime)
+			if (c1.Value is TimeSpan c1ts && c2.Value is TimeSpan c2ts)
             {
-                var c1DateTime = Convert.ToDateTime(c1.Value, CultureInfo.InvariantCulture);
-                var c2DateTime = Convert.ToDateTime(c2.Value, CultureInfo.InvariantCulture);
-                return new LambdaParameterWrapper(c1DateTime - c2DateTime, c1.Cmp);
+                return new LambdaParameterWrapper(c1ts - c2ts, c1.Cmp);
             }
 
-             if (c1.Value is TimeSpan || c2.Value is TimeSpan)
+			if (c1.Value is DateTime c1dt && c2.Value is DateTime c2dt)
             {
-                var c1TimeSpan = c1.Value as TimeSpan?;
-                var c2TimeSpan = c2.Value as TimeSpan?;
-                return new LambdaParameterWrapper(c1TimeSpan - c2TimeSpan, c1.Cmp);
+                return new LambdaParameterWrapper(c1dt - c2dt, c1.Cmp);
+            }
+
+			if (c1.Value is DateTime c1DateTime && c2.Value is TimeSpan c2TimeSpan) 
+            {
+                return new LambdaParameterWrapper(c1DateTime.Add(c2TimeSpan.Negate()), c1.Cmp);
             }
 
 			var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
@@ -221,6 +230,11 @@ namespace NReco.Linq {
 		}
 
 		public static LambdaParameterWrapper operator -(LambdaParameterWrapper c1) {
+			if(c1.Value is TimeSpan ts)
+			{
+				return new LambdaParameterWrapper(ts.Negate(), c1.Cmp);
+			}
+
 			var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
 			return new LambdaParameterWrapper(-c1decimal, c1.Cmp);
 		}

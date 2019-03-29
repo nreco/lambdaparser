@@ -32,6 +32,14 @@ namespace NReco.Linq.Tests {
 			Assert.Equal(cmp.Compare(5, null), 1);
 			Assert.Equal(cmp.Compare(null, 0), -1);
 			Assert.Equal(cmp.Compare(null, null), 0);  // two nulls are equal like in C#
+
+			Assert.Equal(cmp.Compare(new DateTime(), new DateTime().AddDays(1)), -1);
+			Assert.Equal(cmp.Compare(new DateTime().AddDays(1), new DateTime()), 1);
+			Assert.Equal(cmp.Compare(new DateTime(), new DateTime()), 0);
+
+			Assert.Equal(cmp.Compare(new TimeSpan(), new TimeSpan()), 0);
+			Assert.Equal(cmp.Compare(new TimeSpan(), new TimeSpan(0,0,1)), -1);
+			Assert.Equal(cmp.Compare(new TimeSpan(0,0,1), new TimeSpan()), 1);
 		}
 
 		[Fact]
