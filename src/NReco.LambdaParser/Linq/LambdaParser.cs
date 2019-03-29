@@ -89,7 +89,6 @@ namespace NReco.Linq {
 
 		public object Eval(string expr, Func<string,object> getVarValue) {
 			CompiledExpression compiledExpr = null;
-
 			if (UseCache) {
 				lock (_lock) {
 					CachedExpressions.TryGetValue(expr, out compiledExpr);
