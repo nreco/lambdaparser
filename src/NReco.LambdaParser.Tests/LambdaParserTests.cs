@@ -25,6 +25,10 @@ namespace NReco.Linq.Tests {
 			varContext["nullVar"] = null;
 			varContext["name_with_underscore"] = "a_b";
 			varContext["_name_with_underscore"] = "_a_b";
+			varContext["day1"] = new DateTime().AddDays(1);
+			varContext["day2"] = new DateTime().AddDays(2);
+			varContext["oneDay"] = new TimeSpan(1,0,0,0);
+			varContext["twoDays"] = new TimeSpan(2,0,0,0);
 			return varContext;
 		}
 
@@ -102,6 +106,20 @@ namespace NReco.Linq.Tests {
 
 			Assert.True((bool)lambdaParser.Eval("5>two && (5>7 || test.Contains(\"t\") )", varContext));
 			Assert.True((bool)lambdaParser.Eval("null!=test && test!=null && test.Contains(\"t\") && true == Yes && false==!Yes && false!=Yes", varContext));
+
+			Assert.Equal(new DateTime().AddDays(2), lambdaParser.Eval("day1 + oneDay", varContext));
+			Assert.Equal(new DateTime().AddDays(2), lambdaParser.Eval("oneDay + day1", varContext));
+			Assert.Equal(new DateTime().AddDays(1), lambdaParser.Eval("day2 - oneDay", varContext));
+			Assert.Equal(new DateTime().AddDays(1), lambdaParser.Eval("day2 + -oneDay", varContext));
+			Assert.Equal(new DateTime().AddDays(1), lambdaParser.Eval("-oneDay + day2", varContext));
+			Assert.Equal(new TimeSpan(1,0,0,0), lambdaParser.Eval("day2 - day1", varContext));
+			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("day1 - day2", varContext));
+			Assert.Equal(new TimeSpan(1,0,0,0), lambdaParser.Eval("day2 - day1", varContext));
+			Assert.Equal(new TimeSpan(2,0,0,0), lambdaParser.Eval("oneDay + oneDay", varContext));
+			Assert.Equal(new TimeSpan(1,0,0,0), lambdaParser.Eval("twoDays - oneDay", varContext));
+			Assert.Equal(new TimeSpan(1,0,0,0), lambdaParser.Eval("twoDays + -oneDay", varContext));
+			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("oneDay - twoDays", varContext));
+			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("-twoDays + oneDay", varContext));
 		}
 
 		[Fact]
