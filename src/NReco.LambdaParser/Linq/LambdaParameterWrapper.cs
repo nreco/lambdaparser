@@ -189,19 +189,19 @@ namespace NReco.Linq {
 			} 
 
 			if (c1.Value is TimeSpan c1TimeSpan && c2.Value is DateTime c2DateTime) 
-            {
-                return new LambdaParameterWrapper(c2DateTime.Add(c1TimeSpan), c1.Cmp);
-            }
+			{
+				return new LambdaParameterWrapper(c2DateTime.Add(c1TimeSpan), c1.Cmp);
+			}
 
 			if (c1.Value is DateTime c1DateTime && c2.Value is TimeSpan c2TimeSpan) 
-            {
-                return new LambdaParameterWrapper(c1DateTime.Add(c2TimeSpan), c1.Cmp);
-            }
+			{
+				return new LambdaParameterWrapper(c1DateTime.Add(c2TimeSpan), c1.Cmp);
+			}
 
 			if (c1.Value is TimeSpan c1ts && c2.Value is TimeSpan c2ts)
-            {
-                return new LambdaParameterWrapper(c1ts + c2ts, c1.Cmp);
-            }
+			{
+				return new LambdaParameterWrapper(c1ts + c2ts, c1.Cmp);
+			}
 
 			var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
 			var c2decimal = Convert.ToDecimal(c2.Value,  CultureInfo.InvariantCulture);
@@ -210,19 +210,19 @@ namespace NReco.Linq {
 
 		public static LambdaParameterWrapper operator -(LambdaParameterWrapper c1, LambdaParameterWrapper c2) {
 			if (c1.Value is TimeSpan c1ts && c2.Value is TimeSpan c2ts)
-            {
-                return new LambdaParameterWrapper(c1ts - c2ts, c1.Cmp);
-            }
+			{
+				return new LambdaParameterWrapper(c1ts - c2ts, c1.Cmp);
+			}
 
 			if (c1.Value is DateTime c1dt && c2.Value is DateTime c2dt)
-            {
-                return new LambdaParameterWrapper(c1dt - c2dt, c1.Cmp);
-            }
+			{
+				return new LambdaParameterWrapper(c1dt - c2dt, c1.Cmp);
+			}
 
 			if (c1.Value is DateTime c1DateTime && c2.Value is TimeSpan c2TimeSpan) 
-            {
-                return new LambdaParameterWrapper(c1DateTime.Add(c2TimeSpan.Negate()), c1.Cmp);
-            }
+			{
+				return new LambdaParameterWrapper(c1DateTime.Add(c2TimeSpan.Negate()), c1.Cmp);
+			}
 
 			var c1decimal = Convert.ToDecimal(c1.Value, CultureInfo.InvariantCulture);
 			var c2decimal = Convert.ToDecimal(c2.Value, CultureInfo.InvariantCulture);
