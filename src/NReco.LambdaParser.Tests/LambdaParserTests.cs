@@ -123,6 +123,15 @@ namespace NReco.Linq.Tests {
 		}
 
 		[Fact]
+		public void SingleEqualSign() {
+			var varContext = getContext();
+			var lambdaParser = new LambdaParser();
+			lambdaParser.AllowSingleEqualSign = true;
+			Assert.True((bool)lambdaParser.Eval("null = nullVar", varContext));
+			Assert.True((bool)lambdaParser.Eval("5 = (5+1-1)", varContext));
+		}
+
+		[Fact]
 		public void NullComparison() {
 			var varContext = getContext();
 			var lambdaParser = new LambdaParser();

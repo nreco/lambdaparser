@@ -47,12 +47,18 @@ namespace NReco.Linq {
 		public bool UseCache { get; set; }
 
 		/// <summary>
+		/// Allows usage of "=" for equality comparison (in addition to "=="). False by default.
+		/// </summary>
+		public bool AllowSingleEqualSign { get; set; }
+
+		/// <summary>
 		/// Gets value comparer used by the parser for comparison operators.
 		/// </summary>
 		public IValueComparer Comparer { get; private set; }
 
 		public LambdaParser() {
 			UseCache = true;
+			AllowSingleEqualSign = false;
 			Comparer = ValueComparer.Instance;
 		}
 
@@ -304,6 +310,7 @@ namespace NReco.Linq {
 										Expr = Expression.Equal(firstOp.Expr, secondOp.Expr)
 									};
 									continue;
+								case "<>":
 								case "!=":
 									firstOp = new ParseResult() {
 										End = secondOp.End,
@@ -328,7 +335,8 @@ namespace NReco.Linq {
 
 					}
 
-					if (opLexem.GetValue() == ">" || opLexem.GetValue() == "<") {
+					if (opLexem.GetValue() == ">" || opLexem.GetValue() == "<" 
+						|| (AllowSingleEqualSign && opLexem.GetValue() == "=") ) {
 						var secondOp = ParseAdditive(expr, opLexem.End);
 						switch (opLexem.GetValue()) {
 							case ">":
@@ -341,6 +349,12 @@ namespace NReco.Linq {
 								firstOp = new ParseResult() {
 									End = secondOp.End,
 									Expr = Expression.LessThan(firstOp.Expr, secondOp.Expr)
+								};
+								continue;
+							case "=":
+								firstOp = new ParseResult() {
+									End = secondOp.End,
+									Expr = Expression.Equal(firstOp.Expr, secondOp.Expr)
 								};
 								continue;
 						}
