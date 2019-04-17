@@ -3,17 +3,11 @@
   <PropertyGroup>
     <Description>Runtime expressions parser and evaluator (formulas, conditions, method calls, properties/indexers etc). Builds LINQ expression tree and compiles it to lambda delegate with full support of dynamically typed variables.</Description>
 	<Title>Dynamic expressions evaluator</Title>
-    <Copyright>Copyright (c) 2013-2018 Vitalii Fedorchenko</Copyright>
+    <Copyright>Copyright (c) 2013-2019 Vitalii Fedorchenko</Copyright>
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
-    <VersionPrefix>1.0.8</VersionPrefix>
+    <VersionPrefix>1.0.9</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
-	
-	<!-- .NET Core SDK 2.0 / lastest VS 2017 cannot build old PCL targets for unknown reason. -->
-	<TargetFramework>netstandard1.3</TargetFramework>
-    
-	<!-- Full list of targets is used only for building nuget package with CLI (SDK 1.0 still able do that) -->
-	<!--TargetFrameworks>netstandard1.3;portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8</TargetFrameworks-->
-	
+	<TargetFrameworks>netstandard2.0;netstandard1.3;portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>NReco.LambdaParser</AssemblyName>
     <AssemblyOriginatorKeyFile>NReco.LambdaParser.snk</AssemblyOriginatorKeyFile>
@@ -22,6 +16,13 @@
     <PackageId>NReco.LambdaParser</PackageId>
     <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;PCL;netstandard;netcore;net40;net45;WindowsPhone8;Silverlight</PackageTags>
 	<PackageReleaseNotes>Source code and examples: https://github.com/nreco/lambdaparser
+	
+v.1.0.9 changes:
+- defined +/- operations for datetime/timespan types #17
+- added ILambdaValue for accessing real values in Expression produced by LamdbaParser #16
+- added option to allow single equal sign '=' for comparison #13
+- added netstandard2.0 build #15
+	
 v.1.0.8 changes:
 - fixed parse error of calls chain like delegate().method1().method2()
 	
@@ -36,6 +37,8 @@ v.1.0.6 changes:
     <PackageIconUrl>https://www.nrecosite.com/img/nreco-logo-200.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/nreco/lambdaparser</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/nreco/lambdaparser/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/nreco/lambdaparser</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>		
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -49,6 +52,22 @@ v.1.0.6 changes:
 	
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8'">
+    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
+    <NugetTargetMoniker>.NETPortable,Version=v0.0,Profile=Profile259</NugetTargetMoniker>
+    <LanguageTargets>$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets</LanguageTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'portable-net40+sl5+win8+wpa81+wp8'">
+    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
+    <NugetTargetMoniker>.NETPortable,Version=v0.0,Profile=Profile328</NugetTargetMoniker>
+    <LanguageTargets>$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets</LanguageTargets>
+    <DefineConstants>$(DefineConstants);NET40</DefineConstants>	
+  </PropertyGroup>
+  
   <ItemGroup Condition=" '$(TargetFramework)' == 'portable45-net45+win8+wp8+wpa81' ">
 	<Reference Include="System" />
 	<Reference Include="System.Collections" />
@@ -65,11 +84,6 @@ v.1.0.6 changes:
 	<Reference Include="System.Threading" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8' ">
-	<TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
-	<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-	<TargetFrameworkProfile>Profile259</TargetFrameworkProfile>    
-  </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8' ">
 	<Reference Include="System.Core" />
 	<Reference Include="System" />
@@ -84,16 +98,9 @@ v.1.0.6 changes:
 	<Reference Include="System.Globalization"/>	
 	<Reference Include="System.Runtime.Extensions"/>
 	<Reference Include="System.Threading"/>	
-  </ItemGroup>  
+  </ItemGroup>   
   
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'portable-net40+sl5+win8+wpa81+wp8' ">
- 	<TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
-	<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-	<TargetFrameworkProfile>Profile328</TargetFrameworkProfile>   
-    <DefineConstants>$(DefineConstants);NET40</DefineConstants>
-  </PropertyGroup>
-  
-   <ItemGroup Condition=" '$(TargetFramework)' == 'portable-net40+sl5+win8+wpa81+wp8' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'portable-net40+sl5+win8+wpa81+wp8' ">
 	<Reference Include="mscorlib" />
 	<Reference Include="System.Core" />
 	<Reference Include="System" />
@@ -103,4 +110,6 @@ v.1.0.6 changes:
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
   </ItemGroup>
 
+  <Target Name="_GetRestoreSettingsPerFramework"></Target>
+  
 </Project>
