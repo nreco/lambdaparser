@@ -7,7 +7,8 @@
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
     <VersionPrefix>1.0.9</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
-	<TargetFrameworks>netstandard2.0;netstandard1.3;portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8</TargetFrameworks>
+	<TargetFrameworks>netstandard2.0;netstandard1.3</TargetFrameworks>
+	<!--TargetFrameworks>netstandard2.0;netstandard1.3;portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8</TargetFrameworks-->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>NReco.LambdaParser</AssemblyName>
     <AssemblyOriginatorKeyFile>NReco.LambdaParser.snk</AssemblyOriginatorKeyFile>
