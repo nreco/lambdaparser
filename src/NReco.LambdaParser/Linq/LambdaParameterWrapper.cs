@@ -116,11 +116,10 @@ namespace NReco.Linq {
 
 			var resolvedArgs = new object[args.Length];
 			for (int i = 0; i < resolvedArgs.Length; i++) {
-				resolvedArgs[i] = Convert.ChangeType(
-					args[i] is LambdaParameterWrapper ? ((LambdaParameterWrapper)args[i]).Value : args[i],
-					delegParams[i].ParameterType,
-					System.Globalization.CultureInfo.InvariantCulture
-				);
+				var argObj = args[i] is LambdaParameterWrapper ? ((LambdaParameterWrapper)args[i]).Value : args[i];
+				if (!NReco.InvokeMethod.IsInstanceOfType(delegParams[i].ParameterType, argObj))
+					argObj = Convert.ChangeType(argObj, delegParams[i].ParameterType, CultureInfo.InvariantCulture);
+				resolvedArgs[i] = argObj;
 			}
 			return new LambdaParameterWrapper( deleg.DynamicInvoke(resolvedArgs), Cmp );
 		}

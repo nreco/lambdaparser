@@ -106,7 +106,7 @@ namespace NReco {
 			return res;
 		}
 
-		private bool IsInstanceOfType(Type t, object val) {
+		internal static bool IsInstanceOfType(Type t, object val) {
 			#if NET40 
 			return t.IsInstanceOfType(val);
 			#else
