@@ -5,9 +5,9 @@
 	<Title>Dynamic expressions evaluator</Title>
     <Copyright>Copyright (c) 2013-2019 Vitalii Fedorchenko</Copyright>
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
-    <VersionPrefix>1.0.10</VersionPrefix>
+    <VersionPrefix>1.0.11</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
-	<TargetFrameworks>netstandard2.0;netstandard1.3</TargetFrameworks>
+	<TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
 	<!--TargetFrameworks>netstandard2.0;netstandard1.3;portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8</TargetFrameworks-->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>NReco.LambdaParser</AssemblyName>
@@ -17,7 +17,9 @@
     <PackageId>NReco.LambdaParser</PackageId>
     <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;PCL;netstandard;netcore;net40;net45;WindowsPhone8;Silverlight</PackageTags>
 	<PackageReleaseNotes>Source code and examples: https://github.com/nreco/lambdaparser
-
+v.1.0.11 changes:
+- removed legacy Portable targets that cause build problems in some environments
+	
 v.1.0.10 changes:
 - fixed issue with 'Object must implement IConvertible' (occurs when delegate argument doesn't implement IConvertible, even if conversion is not needed)
 	
