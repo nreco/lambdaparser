@@ -158,7 +158,7 @@ namespace NReco.Linq {
 						lexem.Type = LexemType.Name;
 				} else if (Char.IsDigit(s[lexem.End])) {
                     if (lexem.Type == LexemType.Unknown) {
-                        if (s[lexem.End] == '0' && s[lexem.End + 1] == 'x') {
+                        if (/*(lexem.End + 1) < s.Length &&*/ s[lexem.End] == '0' && s[lexem.End + 1] == 'x') {
                             lexem.End++;
                             lexem.Type = LexemType.HexNumberConstant;
                         }
