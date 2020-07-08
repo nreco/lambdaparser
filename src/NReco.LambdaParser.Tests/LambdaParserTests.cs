@@ -41,6 +41,8 @@ namespace NReco.Linq.Tests {
 
 			Assert.Equal("st", lambdaParser.Eval("test.Substring(2)", varContext ) );
 
+			Assert.Equal(true, lambdaParser.Eval("NOT(NOT(1==1))", varContext));
+
 			Assert.Equal(3M, lambdaParser.Eval("1+2", varContext) );
 			Assert.Equal(6M, lambdaParser.Eval("1+2+3", varContext));
 			Assert.Equal("b{0}_", lambdaParser.Eval("\"b{0}_\"", varContext));

@@ -40,6 +40,6 @@ var lambdaParser = new LambdaParser(valComparer);
 NReco.LambdaParser is in production use at [SeekTable.com](https://www.seektable.com/) and [PivotData microservice](https://www.nrecosite.com/pivotdata_service.aspx) (used for user-defined calculated cube members: formulas, custom formatting).
 
 ## License
-Copyright 2016-2019 Vitaliy Fedorchenko
+Copyright 2016-2020 Vitaliy Fedorchenko
 
 Distributed under the MIT license

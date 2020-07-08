@@ -536,7 +536,12 @@ namespace NReco.Linq {
 				}
 				// read parameter
 				var paramExpr = ParseConditional(expr, end);
-				args.Add(paramExpr.Expr);
+				var argExpr = paramExpr.Expr;
+				if (!(argExpr is ConstantExpression constExpr && constExpr.Value is LambdaParameterWrapper)) {
+					// result may be a primitive type like bool
+					argExpr = Expression.Convert(argExpr, typeof(object));
+				}
+				args.Add(argExpr);
 				end = paramExpr.End;
 			} while (true);
 		}
