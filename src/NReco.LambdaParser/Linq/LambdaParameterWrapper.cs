@@ -130,6 +130,13 @@ namespace NReco.Linq {
 			if (obj is LambdaParameterWrapper)
 				obj = ((LambdaParameterWrapper)obj).Value;
 			
+			// An epandoObject has a IDictionary underneath
+			object objectValue;
+			if (obj is IDictionary<string, object> dictionary && dictionary.TryGetValue(propertyName, out objectValue))
+			{
+				return new LambdaParameterWrapper(objectValue, Cmp);
+			}
+
 			#if NET40
 			var prop = obj.GetType().GetProperty(propertyName);
 			#else
@@ -140,6 +147,7 @@ namespace NReco.Linq {
 				var propVal = prop.GetValue(obj, null);
 				return new LambdaParameterWrapper(propVal, Cmp);
 			}
+			
 			#if NET40
 			var fld = obj.GetType().GetField(propertyName);
 			#else
@@ -149,6 +157,7 @@ namespace NReco.Linq {
 				var fldVal = fld.GetValue(obj);
 				return new LambdaParameterWrapper(fldVal, Cmp);
 			}
+			
 			throw new MissingMemberException(obj.GetType().ToString()+"."+propertyName);
 		}
 
