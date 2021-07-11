@@ -5,7 +5,7 @@
 	<Title>Dynamic expressions evaluator</Title>
     <Copyright>Copyright (c) 2013-2020 Vitalii Fedorchenko</Copyright>
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
-    <VersionPrefix>1.0.12</VersionPrefix>
+    <VersionPrefix>1.0.12.1</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
 	<TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
 	<!--TargetFrameworks>netstandard2.0;netstandard1.3;portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8</TargetFrameworks-->
@@ -14,7 +14,7 @@
     <AssemblyOriginatorKeyFile>NReco.LambdaParser.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>False</SignAssembly>
 <!--    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>-->
-    <PackageId>NReco.LambdaParser</PackageId>
+    <PackageId>WillowMedia.NReco.LambdaParser</PackageId>
     <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;PCL;netstandard;netcore;net40;net45;WindowsPhone8;Silverlight</PackageTags>
 	<PackageReleaseNotes>Source code and examples: https://github.com/nreco/lambdaparser
 v.1.0.12 changes:
