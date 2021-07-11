@@ -2,7 +2,75 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <WarningsAsErrors>NU1605;114</WarningsAsErrors>
-        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IncludeSymbols>true</IncludeSymbols>
+        <IncludeSource>false</IncludeSource>
+        <IsTool>false</IsTool>
+        <IncludeBuildOutput>true</IncludeBuildOutput>
+        <IncludeContentInPack>false</IncludeContentInPack>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <Description>Runtime expressions parser and evaluator (formulas, conditions, method calls, properties/indexers etc). Builds LINQ expression tree and compiles it to lambda delegate with full support of dynamically typed variables.</Description>
+        <Title>Dynamic expressions evaluator</Title>
+        <Copyright>Copyright (c) 2013-2020 Vitalii Fedorchenko</Copyright>
+        <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
+        <Version>1.0.12.1</Version>
         <VersionPrefix>1.0.12.1</VersionPrefix>
+        <Authors>Vitalii Fedorchenko</Authors>
+<!--        <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>-->
+        <!--TargetFrameworks>netstandard2.0;netstandard1.3;portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8</TargetFrameworks-->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AssemblyName>NReco.LambdaParser</AssemblyName>
+        <AssemblyOriginatorKeyFile>NReco.LambdaParser.snk</AssemblyOriginatorKeyFile>
+        <SignAssembly>False</SignAssembly>
+        <!--    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>-->
+        <PackageId>WillowMedia.NReco.LambdaParser</PackageId>
+<!--        <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;PCL;netstandard;netcore;net40;net45;WindowsPhone8;Silverlight</PackageTags>-->
+        <PackageReleaseNotes>Source code and examples: https://github.com/nreco/lambdaparser
+            v.1.0.12 changes:
+            - fixed an issue when comparison result is used as an argument in a method call #30
+
+            v.1.0.11 changes:
+            - removed legacy Portable targets that cause build problems in some environments
+
+            v.1.0.10 changes:
+            - fixed issue with 'Object must implement IConvertible' (occurs when delegate argument doesn't implement IConvertible, even if conversion is not needed)
+
+            v.1.0.9 changes:
+            - defined +/- operations for datetime/timespan types #17
+            - added ILambdaValue for accessing real values in Expression produced by LamdbaParser #16
+            - added option to allow single equal sign '=' for comparison #13
+            - added netstandard2.0 build #15
+
+            v.1.0.8 changes:
+            - fixed parse error of calls chain like delegate().method1().method2()
+
+            v.1.0.7 changes:
+            - fixed evaluation of and/or conditions (exceptions like 'AndAlso / OrElse is not defined')
+
+            v.1.0.6 changes:
+            - introduced IValueComparer interface for custom values comparison (https://github.com/nreco/lambdaparser/issues/10)
+            - default ValueComparer implementation with options: NullComparison (MinValue, Sql), SuppressErrors
+            - starting from this version expression cache is instance specific (was global) because calculation result may depend on IValueComparer implementation
+        </PackageReleaseNotes>
+        <PackageIconUrl>https://www.nrecosite.com/img/nreco-logo-200.png</PackageIconUrl>
+        <PackageProjectUrl>https://github.com/nreco/lambdaparser</PackageProjectUrl>
+        <PackageLicenseUrl>https://raw.githubusercontent.com/nreco/lambdaparser/master/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/nreco/lambdaparser</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <!--    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>-->
+<!--        <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>-->
+<!--        <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>-->
+<!--        <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>-->
+<!--        <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>-->
+<!--        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>-->
+<!--        <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>-->
+<!--        <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>-->
+<!--        <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>-->
+<!--        <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>-->
     </PropertyGroup>
 </Project>
