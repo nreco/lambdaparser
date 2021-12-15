@@ -48,7 +48,7 @@ v.1.0.6 changes:
     <PackageLicenseUrl>https://raw.githubusercontent.com/nreco/lambdaparser/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/nreco/lambdaparser</RepositoryUrl>
     <RepositoryType>git</RepositoryType>		
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -58,6 +58,7 @@ v.1.0.6 changes:
     <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <LangVersion>9</LangVersion>
 	
   </PropertyGroup>
 
@@ -96,17 +97,17 @@ v.1.0.6 changes:
   <ItemGroup Condition=" '$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8' ">
 	<Reference Include="System.Core" />
 	<Reference Include="System" />
-	<Reference Include="System.Collections"/>
-	<Reference Include="System.IO"/>
-	<Reference Include="System.Reflection"/>
-	<Reference Include="System.Linq"/>
-	<Reference Include="System.Linq.Expressions"/>
-	<Reference Include="System.Runtime"/>	
-	<Reference Include="System.Resources.ResourceManager"/>	
-	<Reference Include="System.Reflection.Extensions"/>
-	<Reference Include="System.Globalization"/>	
-	<Reference Include="System.Runtime.Extensions"/>
-	<Reference Include="System.Threading"/>	
+	<Reference Include="System.Collections" />
+	<Reference Include="System.IO" />
+	<Reference Include="System.Reflection" />
+	<Reference Include="System.Linq" />
+	<Reference Include="System.Linq.Expressions" />
+	<Reference Include="System.Runtime" />	
+	<Reference Include="System.Resources.ResourceManager" />	
+	<Reference Include="System.Reflection.Extensions" />
+	<Reference Include="System.Globalization" />	
+	<Reference Include="System.Runtime.Extensions" />
+	<Reference Include="System.Threading" />	
   </ItemGroup>   
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'portable-net40+sl5+win8+wpa81+wp8' ">
@@ -116,7 +117,11 @@ v.1.0.6 changes:
   </ItemGroup> 
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
+  </ItemGroup> 
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 
   <Target Name="_GetRestoreSettingsPerFramework"></Target>
