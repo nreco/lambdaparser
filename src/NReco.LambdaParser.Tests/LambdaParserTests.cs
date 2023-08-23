@@ -71,6 +71,10 @@ namespace NReco.Linq.Tests {
 
 			Assert.Equal(4M, lambdaParser.Eval("pi>0 ? one+two+one : 0", varContext));
 
+			Assert.Equal("lightgreen", lambdaParser.Eval("pi<0 ? \"red\" : (pi<25 ? \"lightgreen\" : \"green\") ", varContext));
+
+			Assert.Equal("white", lambdaParser.Eval("pi<1 ? \"red\"\n: (pi<2 ? \"lightgreen\"\n: (pi<3 ? \"green\"\n: \"white\" ) ) ", varContext));
+
 			Assert.Equal(DateTime.Now.Year, lambdaParser.Eval("now.Year", varContext) );
 
 			Assert.Equal(true, lambdaParser.Eval(" (1+testObj.IntProp)==2 ? testObj.FldTrue : false ", varContext));
@@ -133,6 +137,26 @@ namespace NReco.Linq.Tests {
 			lambdaParser.AllowSingleEqualSign = true;
 			Assert.True((bool)lambdaParser.Eval("null = nullVar", varContext));
 			Assert.True((bool)lambdaParser.Eval("5 = (5+1-1)", varContext));
+		}
+
+		[Fact]
+		public void VarsInExpression() {
+			var varContext = getContext();
+			var lambdaParser = new LambdaParser();
+			lambdaParser.AllowVars = true;
+
+			Assert.Equal("False", lambdaParser.Eval("var a = null == nullVar; (!a).ToString()", varContext));
+			Assert.Equal(2M, lambdaParser.Eval("var a = two*2; var b = a*2; b/a", varContext));
+			Assert.True( (bool) lambdaParser.Eval("var a = toString(true); a==\"True\"", varContext));
+			Assert.Throws<LambdaParserException>( () => {
+				lambdaParser.Eval("var a = two*2; ", varContext);
+			});
+			Assert.Throws<LambdaParserException>(() => {
+				lambdaParser.Eval("var a; 5", varContext);
+			});
+			Assert.Throws<LambdaParserException>(() => {
+				lambdaParser.Eval("var a=; 5", varContext);
+			});
 		}
 
 		[Fact]
