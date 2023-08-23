@@ -75,6 +75,8 @@ namespace NReco.Linq.Tests {
 
 			Assert.Equal("white", lambdaParser.Eval("pi<1 ? \"red\"\n: (pi<2 ? \"lightgreen\"\n: (pi<3 ? \"green\"\n: \"white\" ) ) ", varContext));
 
+			Assert.Equal("white", lambdaParser.Eval("pi<1 ? \"red\"\n: pi<2 ? \"lightgreen\"\n: pi<3 ? \"green\"\n: \"white\" ", varContext));
+
 			Assert.Equal(DateTime.Now.Year, lambdaParser.Eval("now.Year", varContext) );
 
 			Assert.Equal(true, lambdaParser.Eval(" (1+testObj.IntProp)==2 ? testObj.FldTrue : false ", varContext));

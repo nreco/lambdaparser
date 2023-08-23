@@ -19,6 +19,7 @@
 	<PackageReleaseNotes>Source code and examples: https://github.com/nreco/lambdaparser
 v.1.1.0 changes:
 - variables in expressions #42 (to enable use LambdaParser.AllowVars)	
+- Sequence of ternary operators #43
 	
 v.1.0.12 changes:
 - fixed an issue when comparison result is used as an argument in a method call #30
