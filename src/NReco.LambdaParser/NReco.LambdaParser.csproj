@@ -3,9 +3,9 @@
   <PropertyGroup>
     <Description>Runtime expressions parser and evaluator (formulas, conditions, method calls, properties/indexers etc). Builds LINQ expression tree and compiles it to lambda delegate with full support of dynamically typed variables.</Description>
 	<Title>Dynamic expressions evaluator</Title>
-    <Copyright>Copyright (c) 2013-2020 Vitalii Fedorchenko</Copyright>
+    <Copyright>Copyright (c) 2013-2023 Vitalii Fedorchenko</Copyright>
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
-    <VersionPrefix>1.0.12</VersionPrefix>
+    <VersionPrefix>1.1.0</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
 	<TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
 	<!--TargetFrameworks>netstandard2.0;netstandard1.3;portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8</TargetFrameworks-->
@@ -15,8 +15,11 @@
     <SignAssembly>False</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>NReco.LambdaParser</PackageId>
-    <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;PCL;netstandard;netcore;net40;net45;WindowsPhone8;Silverlight</PackageTags>
+    <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;netstandard;netcore;net45;</PackageTags>
 	<PackageReleaseNotes>Source code and examples: https://github.com/nreco/lambdaparser
+v.1.1.0 changes:
+- variables in expressions #42 (to enable use LambdaParser.AllowVars)	
+	
 v.1.0.12 changes:
 - fixed an issue when comparison result is used as an argument in a method call #30
 

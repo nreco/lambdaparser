@@ -282,7 +282,7 @@ namespace NReco.Linq {
 
 				var elseLexem = ReadLexem(expr, positiveOp.End);
 				if (elseLexem.Type == LexemType.Delimiter && elseLexem.GetValue() == ":") {
-					var negativeOp = ParseOr(expr, elseLexem.End, vars);
+					var negativeOp = ParseConditional(expr, elseLexem.End, vars);
 					var negativeOpExpr = Expression.New(LambdaParameterWrapperConstructor, 
 							Expression.Convert( negativeOp.Expr, typeof(object)),
 							Expression.Constant(Comparer));
