@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Diagnostics;
+using System.Numerics;
 using System.Text;
 
 using Xunit;
@@ -30,6 +31,8 @@ namespace NReco.Linq.Tests {
 			varContext["day2"] = new DateTime().AddDays(2);
 			varContext["oneDay"] = new TimeSpan(1,0,0,0);
 			varContext["twoDays"] = new TimeSpan(2,0,0,0);
+			varContext["complexZero"] = new Complex();
+			varContext["complexOne"] = new Complex(1d, 1d);
 			return varContext;
 		}
 
@@ -130,6 +133,11 @@ namespace NReco.Linq.Tests {
 			Assert.Equal(new TimeSpan(1,0,0,0), lambdaParser.Eval("twoDays + -oneDay", varContext));
 			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("oneDay - twoDays", varContext));
 			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("-twoDays + oneDay", varContext));
+			
+			Assert.True((bool) lambdaParser.Eval("complexOne != complexZero", varContext));
+			Assert.Equal(new Complex(), lambdaParser.Eval("complexOne * complexZero", varContext));
+			Assert.Equal(new Complex(-1d, -1d), lambdaParser.Eval("-complexOne", varContext));
+			Assert.Equal(Math.Sqrt(2), lambdaParser.Eval("complexOne.Magnitude", varContext));
 		}
 
 		[Fact]
