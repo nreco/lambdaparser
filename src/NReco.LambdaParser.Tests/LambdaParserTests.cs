@@ -45,6 +45,9 @@ namespace NReco.Linq.Tests {
 
 			Assert.Equal(3M, lambdaParser.Eval("1+2", varContext) );
 			Assert.Equal(6M, lambdaParser.Eval("1+2+3", varContext));
+			Assert.Equal(6M, lambdaParser.Eval("0x1+0x02+0x003+0", varContext));
+			Assert.Equal(276M, lambdaParser.Eval("0xFF+0x0A+0x0B", varContext));
+
 			Assert.Equal("b{0}_", lambdaParser.Eval("\"b{0}_\"", varContext));
 
 			Assert.Equal(3M, lambdaParser.Eval("(1+(3-1)*4)/3", varContext));

@@ -189,8 +189,15 @@ namespace NReco.Linq {
 					if (lexem.Type == LexemType.Unknown)
 						lexem.Type = LexemType.Name;
 				} else if (Char.IsDigit(s[lexem.End])) {
-					if (lexem.Type == LexemType.Unknown)
-						lexem.Type = LexemType.NumberConstant;
+                    if (lexem.Type == LexemType.Unknown) {
+                        if ((lexem.End + 1) < s.Length && s[lexem.End] == '0' && s[lexem.End + 1] == 'x') {
+                            lexem.End++;
+                            lexem.Type = LexemType.HexNumberConstant;
+                        }
+                        else {
+                            lexem.Type = LexemType.NumberConstant;
+                        }
+                    }
 				} else if (Array.IndexOf(specialNameChars, s[lexem.End]) >= 0) {
 					if (lexem.Type == LexemType.Unknown || lexem.Type==LexemType.Name) {
 						lexem.Type = LexemType.Name;
@@ -630,7 +637,16 @@ namespace NReco.Linq {
 				return new ParseResult() { 
 					End = lexem.End, 
 					Expr = Expression.Constant(new LambdaParameterWrapper( numConst, Comparer) ) };
-			} else if (lexem.Type == LexemType.StringConstant) {
+            } else if (lexem.Type == LexemType.HexNumberConstant) {
+                int numConst;
+                if (!Int32.TryParse(lexem.GetValue(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out numConst))
+                {
+                    throw new Exception(String.Format("Invalid number: {0}", lexem.GetValue()));
+                }
+                return new ParseResult() {
+                    End = lexem.End,
+                    Expr = Expression.Constant(new LambdaParameterWrapper( numConst, Comparer) ) };
+            } else if (lexem.Type == LexemType.StringConstant) {
 				return new ParseResult() { 
 					End = lexem.End, 
 					Expr = Expression.Constant( new LambdaParameterWrapper( lexem.GetValue(), Comparer) ) };
@@ -723,6 +739,7 @@ namespace NReco.Linq {
 			Delimiter,
 			StringConstant,
 			NumberConstant,
+            HexNumberConstant,
 			Stop
 		}
 
@@ -739,7 +756,9 @@ namespace NReco.Linq {
 					rawValue = Expr.Substring(Start, End-Start).Trim();
 					if (Type==LexemType.StringConstant) {
 						rawValue = rawValue.Substring(1, rawValue.Length-2).Replace( "\"\"", "\"" ); 
-					}
+					} else if (Type == LexemType.HexNumberConstant) {
+                        rawValue = rawValue.Replace("0x", "");
+                    }
 				}
 				return rawValue;
 			}
