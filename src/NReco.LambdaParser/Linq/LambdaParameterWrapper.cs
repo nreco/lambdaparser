@@ -129,14 +129,35 @@ namespace NReco.Linq {
 				throw new NullReferenceException(String.Format("Property or field {0} target is null", propertyName));
 			if (obj is LambdaParameterWrapper)
 				obj = ((LambdaParameterWrapper)obj).Value;
-			
-			#if NET40
-			var prop = obj.GetType().GetProperty(propertyName);
-			#else
-			var prop = obj.GetType().GetRuntimeProperty(propertyName);
-			#endif
 
-			if (prop != null) {
+			//Additional check since obj appears to still be null in some use cases
+            if (obj == null)
+                throw new NullReferenceException(String.Format("Property or field {0} target is null", propertyName));
+
+            
+            PropertyInfo prop;
+            try
+            {
+				#if NET40
+					prop = obj.GetType().GetProperty(propertyName);
+				#else
+					prop = obj.GetType().GetRuntimeProperty(propertyName);
+				#endif
+            }
+			//Below covers an issue caused by properties declared in base classes with different signitures
+			//in these cases an AmbiguousMatchException is thrown
+			//if this happens then we look for the first match by propertyName since this
+			//seems to be the one from the decendant class.
+			catch (System.Reflection.AmbiguousMatchException)
+            {
+				#if NET40
+					prop = obj.GetType().GetProperties().FirstOrDefault(rp=>rp.Name == propertyName);
+				#else
+					prop = obj.GetType().GetRuntimeProperties().FirstOrDefault(rp=>rp.Name == propertyName);
+				#endif
+            }
+
+            if (prop != null) {
 				var propVal = prop.GetValue(obj, null);
 				return new LambdaParameterWrapper(propVal, Cmp);
 			}

@@ -65,7 +65,19 @@ namespace NReco {
 			#endif
 		}
 
-		public object Invoke(object[] args) {
+
+        private int OptionalParameterCount(ParameterInfo[] parameters)
+        {
+            var cnt = 0;
+            for (int i = parameters.Length - 1; i >= 0; i--)
+            {
+                if (parameters[i].IsOptional) cnt++; else break;
+            }
+            return cnt;
+        }
+
+
+        public object Invoke(object[] args) {
 			Type[] argTypes = new Type[args.Length];
 			for (int i = 0; i < argTypes.Length; i++)
 				argTypes[i] = args[i] != null ? args[i].GetType() : typeof(object);
@@ -75,14 +87,24 @@ namespace NReco {
 			// fuzzy matching
 			if (targetMethodInfo==null) {
 				var methods = GetAllMethods();
-
 				foreach (var m in methods)
-					if (m.Name==MethodName &&
-						m.GetParameters().Length == args.Length &&
-						CheckParamsCompatibility(m.GetParameters(), argTypes, args)) {
-						targetMethodInfo = m;
-						break;
-					}
+				{
+					if (m.Name == MethodName)
+					{
+                        var para = m.GetParameters();
+						var paracnt = para.Length;
+						var optcnt = OptionalParameterCount(para);
+						var mincnt = paracnt - optcnt;
+						if (
+                            (args.Length >= mincnt && args.Length <= paracnt) &&
+                            CheckParamsCompatibility(para, argTypes, args)
+						)
+                        {
+                            targetMethodInfo = m;
+                            break;
+                        }
+                    }
+				}	
 			}
 			if (targetMethodInfo == null) {
 				string[] argTypeNames = new string[argTypes.Length];
@@ -115,29 +137,39 @@ namespace NReco {
 		}
 
 		protected bool CheckParamsCompatibility(ParameterInfo[] paramsInfo, Type[] types, object[] values) {
+			var valueslen = values.Length;
 			for (int i=0; i<paramsInfo.Length; i++) {
 				Type paramType = paramsInfo[i].ParameterType;
-				var val = values[i];
-				if (IsInstanceOfType(paramType, val))
-					continue;
-				// null and reference types
-				if (val==null && 
-					#if NET40
+				if (i<valueslen)
+				{
+                    var val = values[i];
+                    if (IsInstanceOfType(paramType, val))
+                        continue;
+                    // null and reference types
+                    if (val == null &&
+#if NET40
 					!paramType.IsValueType
-					#else 
-					!paramType.GetTypeInfo().IsValueType
-					#endif
-				)
-					continue;
-				// possible autocast between generic/non-generic common types
-				try {
-					Convert.ChangeType(val, paramType, System.Globalization.CultureInfo.InvariantCulture);
-					continue;
-				} catch { }
-				//if (ConvertManager.CanChangeType(types[i],paramType))
-				//	continue;
-				// incompatible parameter
-				return false;
+#else
+                        !paramType.GetTypeInfo().IsValueType
+#endif
+                    )
+                        continue;
+                    // possible autocast between generic/non-generic common types
+                    try
+                    {
+                        Convert.ChangeType(val, paramType, System.Globalization.CultureInfo.InvariantCulture);
+                        continue;
+                    }
+                    catch { }
+                    //if (ConvertManager.CanChangeType(types[i],paramType))
+                    //	continue;
+                    // incompatible parameter
+                    return false;
+                }
+				else
+				{
+					if (!paramsInfo[i].IsOptional) return false;
+				}
 			}
 			return true;
 		}
@@ -146,17 +178,28 @@ namespace NReco {
 		protected object[] PrepareActualValues(ParameterInfo[] paramsInfo, object[] values) {
 			object[] res = new object[paramsInfo.Length];
 			for (int i=0; i<paramsInfo.Length; i++) {
-				if (values[i]==null || IsInstanceOfType( paramsInfo[i].ParameterType, values[i])) {
-					res[i] = values[i];
-					continue;
+				if (i < values.Length)
+				{
+					if (values[i]==null || IsInstanceOfType( paramsInfo[i].ParameterType, values[i])) {
+						res[i] = values[i];
+						continue;
+					}
+					try {
+						res[i] = Convert.ChangeType( values[i], paramsInfo[i].ParameterType, System.Globalization.CultureInfo.InvariantCulture );
+						continue;
+					} catch { 
+						throw new InvalidCastException( 
+							String.Format("Invoke method '{0}': cannot convert argument #{1} from {2} to {3}",
+								MethodName, i, values[i].GetType(), paramsInfo[i].ParameterType));
+					}
 				}
-				try {
-					res[i] = Convert.ChangeType( values[i], paramsInfo[i].ParameterType, System.Globalization.CultureInfo.InvariantCulture );
-					continue;
-				} catch { 
-					throw new InvalidCastException( 
-						String.Format("Invoke method '{0}': cannot convert argument #{1} from {2} to {3}",
-							MethodName, i, values[i].GetType(), paramsInfo[i].ParameterType));
+				else
+				{
+					if (paramsInfo[i].IsOptional)
+					{
+                        res[i] = paramsInfo[i].DefaultValue;
+					}
+					else throw new ArgumentException($"Invoke method '{MethodName}': Missing argument {paramsInfo[i].Name} not optional");
 				}
 			}
 			return res;
