@@ -6,6 +6,7 @@ using System.Text;
 
 using Xunit;
 using System.Transactions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 namespace NReco.Linq.Tests {
 
@@ -141,6 +142,9 @@ namespace NReco.Linq.Tests {
             Assert.True((bool)lambdaParser.Eval("testObj.TestShadowMethod()", varContext));
 
 			Assert.True((bool)lambdaParser.Eval("testObj.TestShadowProperty", varContext));
+
+			Assert.True((bool)lambdaParser.Eval("testObj.ParamMethodTest(\"Test\",123,\"This\",\"Is\",\"a\",\"Test\")", varContext));
+
 		}
 
 		[Fact]
@@ -273,6 +277,10 @@ namespace NReco.Linq.Tests {
 
 			public new bool TestShadowProperty { get { return true; } }
 
+			public string ParamMethodTest(string First, int Second, params string[] args)
+			{
+				return string.Concat(First, Second) + string.Concat(args);
+			}
 
 		}
 
