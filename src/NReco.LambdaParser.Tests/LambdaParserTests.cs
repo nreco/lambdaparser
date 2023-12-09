@@ -143,8 +143,9 @@ namespace NReco.Linq.Tests {
 
 			Assert.True((bool)lambdaParser.Eval("testObj.TestShadowProperty", varContext));
 
-			Assert.True((bool)lambdaParser.Eval("testObj.ParamMethodTest(\"Test\",123,\"This\",\"Is\",\"a\",\"Test\")", varContext));
-
+			Assert.Equal("Test123ThisIsaTest",(string)lambdaParser.Eval("testObj.ParamMethodTest(\"Test\",123,\"This\",\"Is\",\"a\",\"Test\")", varContext));
+			Assert.Equal("Today is Saturday, Day 9 of December",lambdaParser.Eval("testObj.Format(\"Today is {0}, Day {1} of {2}\",\"Saturday\",9,\"December\")", varContext));
+			
 		}
 
 		[Fact]
@@ -281,6 +282,11 @@ namespace NReco.Linq.Tests {
 			{
 				return string.Concat(First, Second) + string.Concat(args);
 			}
+
+			public string Format(string format,params object[] args)
+            {
+				return String.Format(format, args);
+            }
 
 		}
 

@@ -95,8 +95,9 @@ namespace NReco {
 						var paracnt = para.Length;
 						var optcnt = OptionalParameterCount(para);
 						var mincnt = paracnt - optcnt;
+						var hasParamArray = para[para.Length - 1].GetCustomAttribute<ParamArrayAttribute>() != null;						
 						if (
-                            (args.Length >= mincnt && args.Length <= paracnt) &&
+                            (args.Length >= mincnt && (args.Length <= paracnt || hasParamArray)) &&
                             CheckParamsCompatibility(para, argTypes, args)
 						)
                         {
@@ -136,35 +137,53 @@ namespace NReco {
 			#endif
 		}
 
+
+		private bool CheckParamValueCompatibility(Type paramType, object val)
+		{
+			if (IsInstanceOfType(paramType, val))
+				return true;
+			// null and reference types
+			if (val == null &&
+				#if NET40
+					!paramType.IsValueType
+				#else
+					!paramType.GetTypeInfo().IsValueType
+				#endif
+				)
+				return true;
+			// possible autocast between generic/non-generic common types
+			try
+			{
+				Convert.ChangeType(val, paramType, System.Globalization.CultureInfo.InvariantCulture);
+				return true;
+			}
+			catch { }
+			//if (ConvertManager.CanChangeType(types[i],paramType))
+			//	continue;
+			// incompatible parameter
+			return false;
+		}
+
 		protected bool CheckParamsCompatibility(ParameterInfo[] paramsInfo, Type[] types, object[] values) {
 			var valueslen = values.Length;
 			for (int i=0; i<paramsInfo.Length; i++) {
-				Type paramType = paramsInfo[i].ParameterType;
+				ParameterInfo paramInfo = paramsInfo[i];
+				bool isParamArray = paramInfo.GetCustomAttribute<ParamArrayAttribute>() != null;
+				Type paramType = isParamArray ? paramInfo.ParameterType.GetElementType() : paramInfo.ParameterType;				
 				if (i<valueslen)
 				{
-                    var val = values[i];
-                    if (IsInstanceOfType(paramType, val))
-                        continue;
-                    // null and reference types
-                    if (val == null &&
-#if NET40
-					!paramType.IsValueType
-#else
-                        !paramType.GetTypeInfo().IsValueType
-#endif
-                    )
-                        continue;
-                    // possible autocast between generic/non-generic common types
-                    try
+					if (isParamArray)
                     {
-                        Convert.ChangeType(val, paramType, System.Globalization.CultureInfo.InvariantCulture);
-                        continue;
+                        //ParamArray is always last parameter, so check all remaining values
+                        for (int j = i; j < valueslen; j++)
+                        {
+							if (!CheckParamValueCompatibility(paramType, values[j])) return false;
+						}
                     }
-                    catch { }
-                    //if (ConvertManager.CanChangeType(types[i],paramType))
-                    //	continue;
-                    // incompatible parameter
-                    return false;
+                    else
+                    {
+						if (!CheckParamValueCompatibility(paramType, values[i])) return false;
+					}
                 }
 				else
 				{
@@ -175,23 +194,49 @@ namespace NReco {
 		}
 
 
+		private object PrepareActualValue(Type paramType, object value)
+        {
+			if (value == null || IsInstanceOfType(paramType, value))
+			{
+				return value;
+			}
+			return Convert.ChangeType(value, paramType, System.Globalization.CultureInfo.InvariantCulture);
+		}
+
 		protected object[] PrepareActualValues(ParameterInfo[] paramsInfo, object[] values) {
 			object[] res = new object[paramsInfo.Length];
+			var valueslen = values.Length;
 			for (int i=0; i<paramsInfo.Length; i++) {
-				if (i < values.Length)
+				ParameterInfo paramInfo = paramsInfo[i];
+				bool isParamArray = paramInfo.GetCustomAttribute<ParamArrayAttribute>() != null;
+				Type paramType = isParamArray ? paramInfo.ParameterType.GetElementType() : paramInfo.ParameterType;
+				if (i < valueslen)
 				{
-					if (values[i]==null || IsInstanceOfType( paramsInfo[i].ParameterType, values[i])) {
-						res[i] = values[i];
-						continue;
+                    try
+                    {
+						if (isParamArray)
+						{
+							//ParamArray is always last parameter, so prepare all remaining values into object array
+							object[] Params = (object[])Activator.CreateInstance(paramInfo.ParameterType, new object[] { valueslen - i });
+							int pc = 0;
+							for (int j = i; j < valueslen; j++)
+							{
+								Params[pc] = PrepareActualValue(paramType, values[j]);
+								pc++;
+							}
+							res[i] = Params;
+						}
+						else
+						{
+							res[i] = PrepareActualValue(paramType, values[i]);
+						}
 					}
-					try {
-						res[i] = Convert.ChangeType( values[i], paramsInfo[i].ParameterType, System.Globalization.CultureInfo.InvariantCulture );
-						continue;
-					} catch { 
-						throw new InvalidCastException( 
+                    catch (Exception)
+                    {
+						throw new InvalidCastException(
 							String.Format("Invoke method '{0}': cannot convert argument #{1} from {2} to {3}",
 								MethodName, i, values[i].GetType(), paramsInfo[i].ParameterType));
-					}
+					}			
 				}
 				else
 				{
