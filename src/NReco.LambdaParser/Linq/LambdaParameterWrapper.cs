@@ -28,13 +28,15 @@ namespace NReco.Linq {
 	internal sealed class LambdaParameterWrapper : IComparable, ILambdaValue {
 		object _Value;
 		IValueComparer Cmp;
+		InvokeMethod Invoker;
 
 		public object Value {
 			get { return _Value; }
 		}
 
-		public LambdaParameterWrapper(object val, IValueComparer valueComparer) {
+		public LambdaParameterWrapper(object val, IValueComparer valueComparer, InvokeMethod invoker) {
 			Cmp = valueComparer;
+			Invoker = invoker;
 			if (val is LambdaParameterWrapper)
 				_Value = ((LambdaParameterWrapper)val).Value; // unwrap
 			else if (val is object[]) {
@@ -62,7 +64,7 @@ namespace NReco.Linq {
 			}
 		}
 
-		public LambdaParameterWrapper CreateDictionary(object[] keys, object[] values) {
+		public LambdaParameterWrapper CreateDictionary(object[] keys, object[] values) {			
 			if (keys.Length!=values.Length)
 				throw new ArgumentException();
 			var d = new Dictionary<object,object>();

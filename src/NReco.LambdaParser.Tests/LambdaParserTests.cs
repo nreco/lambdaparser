@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Diagnostics;
-using System.Text;
-
 using Xunit;
-using System.Transactions;
 
 namespace NReco.Linq.Tests {
 
@@ -141,6 +138,10 @@ namespace NReco.Linq.Tests {
             Assert.True((bool)lambdaParser.Eval("testObj.TestShadowMethod()", varContext));
 
 			Assert.True((bool)lambdaParser.Eval("testObj.TestShadowProperty", varContext));
+
+			Assert.Equal("Test123ThisIsaTest",(string)lambdaParser.Eval("testObj.ParamMethodTest(\"Test\",123,\"This\",\"Is\",\"a\",\"Test\")", varContext));
+			Assert.Equal("Today is Saturday, Day 9 of December",lambdaParser.Eval("testObj.Format(\"Today is {0}, Day {1} of {2}\",\"Saturday\",9,\"December\")", varContext));
+			
 		}
 
 		[Fact]
@@ -273,6 +274,15 @@ namespace NReco.Linq.Tests {
 
 			public new bool TestShadowProperty { get { return true; } }
 
+			public string ParamMethodTest(string First, int Second, params string[] args)
+			{
+				return string.Concat(First, Second) + string.Concat(args);
+			}
+
+			public string Format(string format,params object[] args)
+            {
+				return String.Format(format, args);
+            }
 
 		}
 

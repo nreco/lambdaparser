@@ -25,16 +25,16 @@ namespace NReco {
 	/// </summary>
 	internal class InvokeMethod {
 
-		public object TargetObject { get; set; }
+		//public object TargetObject { get; set; }
 
-		public string MethodName { get; set; }
+		//public string MethodName { get; set; }
 
-		public InvokeMethod(object o, string methodName) {
-			TargetObject = o;
-			MethodName = methodName;
-		}
+		//public InvokeMethod(object o, string methodName) {
+		//	TargetObject = o;
+		//	MethodName = methodName;
+		//}
 
-		protected MethodInfo FindMethod(Type[] argTypes) {
+		protected MethodInfo FindMethod(object TargetObject, string MethodName, Type[] argTypes) {
 			if (TargetObject is Type) {
 				// static method
 				#if NET40
@@ -50,7 +50,7 @@ namespace NReco {
 			#endif
 		}
 
-		protected IEnumerable<MethodInfo> GetAllMethods() {
+		protected IEnumerable<MethodInfo> GetAllMethods(object TargetObject) {
 			if (TargetObject is Type) {
 				#if NET40
 				return ((Type)TargetObject).GetMethods(BindingFlags.Static | BindingFlags.Public);
@@ -66,44 +66,37 @@ namespace NReco {
 		}
 
 
-        private int OptionalParameterCount(ParameterInfo[] parameters)
-        {
-            var cnt = 0;
-            for (int i = parameters.Length - 1; i >= 0; i--)
-            {
-                if (parameters[i].IsOptional) cnt++; else break;
-            }
-            return cnt;
-        }
+		private int OptionalParameterCount(ParameterInfo[] parameters) {
+			var cnt = 0;
+			for (int i = parameters.Length - 1; i >= 0; i--) {
+				if (parameters[i].IsOptional) cnt++; else break;
+			}
+			return cnt;
+		}
 
 
-        public object Invoke(object[] args) {
+        public object Invoke(object TargetObject, string MethodName, object[] args) {
 			Type[] argTypes = new Type[args.Length];
 			for (int i = 0; i < argTypes.Length; i++)
 				argTypes[i] = args[i] != null ? args[i].GetType() : typeof(object);
 
 			// strict matching first
-			MethodInfo targetMethodInfo = FindMethod(argTypes);
+			MethodInfo targetMethodInfo = FindMethod(TargetObject, MethodName, argTypes);
 			// fuzzy matching
 			if (targetMethodInfo==null) {
-				var methods = GetAllMethods();
-				foreach (var m in methods)
-				{
-					if (m.Name == MethodName)
-					{
-                        var para = m.GetParameters();
+				var methods = GetAllMethods(TargetObject);
+				foreach (var m in methods) {
+					if (m.Name == MethodName) {
+						var para = m.GetParameters();
 						var paracnt = para.Length;
 						var optcnt = OptionalParameterCount(para);
 						var mincnt = paracnt - optcnt;
-						if (
-                            (args.Length >= mincnt && args.Length <= paracnt) &&
-                            CheckParamsCompatibility(para, argTypes, args)
-						)
-                        {
-                            targetMethodInfo = m;
-                            break;
-                        }
-                    }
+						var hasParamArray = para[para.Length - 1].GetCustomAttribute<ParamArrayAttribute>() != null;
+						if ((args.Length >= mincnt && (args.Length <= paracnt || hasParamArray)) &&	CheckParamsCompatibility(para, argTypes, args)) {
+							targetMethodInfo = m;
+							break;
+						}
+					}
 				}	
 			}
 			if (targetMethodInfo == null) {
@@ -112,9 +105,9 @@ namespace NReco {
 					argTypeNames[i] = argTypes[i].Name;
 				string argTypeNamesStr = String.Join(",",argTypeNames);
 				throw new MissingMemberException(
-						(TargetObject is Type ? (Type)TargetObject : TargetObject.GetType()).FullName+"."+MethodName );
+						(TargetObject is Type ? (Type)TargetObject : TargetObject.GetType()).FullName+"."+MethodName);
 			}
-			object[] argValues = PrepareActualValues(targetMethodInfo.GetParameters(),args);
+			object[] argValues = PrepareActualValues(MethodName,targetMethodInfo.GetParameters(),args);
 			object res = null;
 			try {
 				res = targetMethodInfo.Invoke( TargetObject is Type ? null : TargetObject, argValues);
@@ -136,68 +129,95 @@ namespace NReco {
 			#endif
 		}
 
+
+		private bool CheckParamValueCompatibility(Type paramType, object val)
+		{
+			if (IsInstanceOfType(paramType, val))
+				return true;
+			// null and reference types
+			if (val == null &&
+				#if NET40
+					!paramType.IsValueType
+				#else
+					!paramType.GetTypeInfo().IsValueType
+				#endif
+				)
+				return true;
+			// possible autocast between generic/non-generic common types
+			try {
+				Convert.ChangeType(val, paramType, System.Globalization.CultureInfo.InvariantCulture);
+				return true;
+			}
+			catch { }
+			//if (ConvertManager.CanChangeType(types[i],paramType))
+			//	continue;
+			// incompatible parameter
+			return false;
+		}
+
 		protected bool CheckParamsCompatibility(ParameterInfo[] paramsInfo, Type[] types, object[] values) {
 			var valueslen = values.Length;
 			for (int i=0; i<paramsInfo.Length; i++) {
-				Type paramType = paramsInfo[i].ParameterType;
-				if (i<valueslen)
-				{
-                    var val = values[i];
-                    if (IsInstanceOfType(paramType, val))
-                        continue;
-                    // null and reference types
-                    if (val == null &&
-#if NET40
-					!paramType.IsValueType
-#else
-                        !paramType.GetTypeInfo().IsValueType
-#endif
-                    )
-                        continue;
-                    // possible autocast between generic/non-generic common types
-                    try
-                    {
-                        Convert.ChangeType(val, paramType, System.Globalization.CultureInfo.InvariantCulture);
-                        continue;
-                    }
-                    catch { }
-                    //if (ConvertManager.CanChangeType(types[i],paramType))
-                    //	continue;
-                    // incompatible parameter
-                    return false;
+				ParameterInfo paramInfo = paramsInfo[i];
+				bool isParamArray = paramInfo.GetCustomAttribute<ParamArrayAttribute>() != null;
+				Type paramType = isParamArray ? paramInfo.ParameterType.GetElementType() : paramInfo.ParameterType;				
+				if (i<valueslen) {
+					if (isParamArray) {
+						//ParamArray is always last parameter, so check all remaining values
+						for (int j = i; j < valueslen; j++)	{
+							if (!CheckParamValueCompatibility(paramType, values[j])) return false;
+						}
+					}
+					else {
+						if (!CheckParamValueCompatibility(paramType, values[i])) return false;
+					}
                 }
-				else
-				{
+				else {
 					if (!paramsInfo[i].IsOptional) return false;
 				}
 			}
 			return true;
 		}
 
+		private object PrepareActualValue(Type paramType, object value) {
+			if (value == null || IsInstanceOfType(paramType, value)) {
+				return value;
+			}
+			return Convert.ChangeType(value, paramType, System.Globalization.CultureInfo.InvariantCulture);
+		}
 
-		protected object[] PrepareActualValues(ParameterInfo[] paramsInfo, object[] values) {
+		protected object[] PrepareActualValues(string MethodName, ParameterInfo[] paramsInfo, object[] values) {
 			object[] res = new object[paramsInfo.Length];
+			var valueslen = values.Length;
 			for (int i=0; i<paramsInfo.Length; i++) {
-				if (i < values.Length)
-				{
-					if (values[i]==null || IsInstanceOfType( paramsInfo[i].ParameterType, values[i])) {
-						res[i] = values[i];
-						continue;
-					}
+				ParameterInfo paramInfo = paramsInfo[i];
+				bool isParamArray = paramInfo.GetCustomAttribute<ParamArrayAttribute>() != null;
+				Type paramType = isParamArray ? paramInfo.ParameterType.GetElementType() : paramInfo.ParameterType;
+				if (i < valueslen) {
 					try {
-						res[i] = Convert.ChangeType( values[i], paramsInfo[i].ParameterType, System.Globalization.CultureInfo.InvariantCulture );
-						continue;
-					} catch { 
-						throw new InvalidCastException( 
+						if (isParamArray) {
+							//ParamArray is always last parameter, so prepare all remaining values into object array
+							object[] Params = (object[])Activator.CreateInstance(paramInfo.ParameterType, new object[] { valueslen - i });
+							int pc = 0;
+							for (int j = i; j < valueslen; j++)	{
+								Params[pc] = PrepareActualValue(paramType, values[j]);
+								pc++;
+							}
+							res[i] = Params;
+						}
+						else {
+							res[i] = PrepareActualValue(paramType, values[i]);
+						}
+					}
+					catch (Exception) {
+						throw new InvalidCastException(
 							String.Format("Invoke method '{0}': cannot convert argument #{1} from {2} to {3}",
 								MethodName, i, values[i].GetType(), paramsInfo[i].ParameterType));
-					}
+					}			
 				}
-				else
-				{
-					if (paramsInfo[i].IsOptional)
-					{
-                        res[i] = paramsInfo[i].DefaultValue;
+				else {
+					if (paramsInfo[i].IsOptional) {
+						res[i] = paramsInfo[i].DefaultValue;
 					}
 					else throw new ArgumentException($"Invoke method '{MethodName}': Missing argument {paramsInfo[i].Name} not optional");
 				}
