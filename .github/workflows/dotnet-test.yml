@@ -1,0 +1,27 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore src
+    - name: Build Lib
+      run: dotnet build src/NReco.LambdaParser -property:TargetFrameworks=netstandard2.0 --no-restore
+    - name: Build Tests
+      run: dotnet build src/NReco.LambdaParser.Tests --no-restore      
+    - name: Test
+      run: dotnet test src/NReco.LambdaParser.Tests --no-build --verbosity normal

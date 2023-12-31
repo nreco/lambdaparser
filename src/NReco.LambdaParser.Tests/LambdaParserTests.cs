@@ -129,23 +129,29 @@ namespace NReco.Linq.Tests {
 			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("oneDay - twoDays", varContext));
 			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("-twoDays + oneDay", varContext));
 
+			
+		}
+
+		[Fact]
+		public void OptionsParams() {
 			//Use new invoker
-			lambdaParser = new LambdaParser(OptionsParamsInvokeMethod.Instance);
+			var lambdaParser = new LambdaParser(OptionsParamsInvokeMethod.Instance);
+			var varContext = getContext();
 
 			Assert.True((bool)lambdaParser.Eval("testObj.OptionalParam(true,true)", varContext));
-            Assert.False((bool)lambdaParser.Eval("testObj.OptionalParam(true,true,false)", varContext));
+			Assert.False((bool)lambdaParser.Eval("testObj.OptionalParam(true,true,false)", varContext));
 
-            Assert.True((bool)lambdaParser.Eval("testObj.OptionalParam2(true,true)", varContext));
-            Assert.False((bool)lambdaParser.Eval("testObj.OptionalParam2(true,true,true,\"fail\")", varContext));
+			Assert.True((bool)lambdaParser.Eval("testObj.OptionalParam2(true,true)", varContext));
+			Assert.False((bool)lambdaParser.Eval("testObj.OptionalParam2(true,true,true,\"fail\")", varContext));
 
-            Assert.True((bool)lambdaParser.Eval("testObj.TestShadowMethod()", varContext));
+			Assert.True((bool)lambdaParser.Eval("testObj.TestShadowMethod()", varContext));
 
 			Assert.True((bool)lambdaParser.Eval("testObj.TestShadowProperty", varContext));
 
-			Assert.Equal("Test123ThisIsaTest",(string)lambdaParser.Eval("testObj.ParamMethodTest(\"Test\",123,\"This\",\"Is\",\"a\",\"Test\")", varContext));
-			Assert.Equal("Today is Saturday, Day 9 of December",lambdaParser.Eval("testObj.Format(\"Today is {0}, Day {1} of {2}\",\"Saturday\",9,\"December\")", varContext));
-			
+			Assert.Equal("Test123ThisIsaTest", (string)lambdaParser.Eval("testObj.ParamMethodTest(\"Test\",123,\"This\",\"Is\",\"a\",\"Test\")", varContext));
+			Assert.Equal("Today is Saturday, Day 9 of December", lambdaParser.Eval("testObj.Format(\"Today is {0}, Day {1} of {2}\",\"Saturday\",9,\"December\")", varContext));
 		}
+
 
 		[Fact]
 		public void SingleEqualSign() {
