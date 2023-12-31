@@ -23,18 +23,18 @@ namespace NReco {
 	/// <summary>
 	/// Invoke object's method that is most compatible with provided arguments
 	/// </summary>
-	internal class InvokeMethod {
+	internal class InvokeMethod : Linq.IInvokeMethod {
 
-		public object TargetObject { get; set; }
+		internal readonly static InvokeMethod _Instance = new InvokeMethod();
 
-		public string MethodName { get; set; }
-
-		public InvokeMethod(object o, string methodName) {
-			TargetObject = o;
-			MethodName = methodName;
+		public static Linq.IInvokeMethod Instance
+		{
+			get	{
+				return _Instance;
+			}
 		}
 
-		protected MethodInfo FindMethod(Type[] argTypes) {
+		protected MethodInfo FindMethod(object TargetObject, string MethodName, Type[] argTypes) {
 			if (TargetObject is Type) {
 				// static method
 				#if NET40
@@ -50,7 +50,7 @@ namespace NReco {
 			#endif
 		}
 
-		protected IEnumerable<MethodInfo> GetAllMethods() {
+		protected IEnumerable<MethodInfo> GetAllMethods(object TargetObject) {
 			if (TargetObject is Type) {
 				#if NET40
 				return ((Type)TargetObject).GetMethods(BindingFlags.Static | BindingFlags.Public);
@@ -65,16 +65,16 @@ namespace NReco {
 			#endif
 		}
 
-		public object Invoke(object[] args) {
+		public object Invoke(object TargetObject, string MethodName, object[] args) {
 			Type[] argTypes = new Type[args.Length];
 			for (int i = 0; i < argTypes.Length; i++)
 				argTypes[i] = args[i] != null ? args[i].GetType() : typeof(object);
 
 			// strict matching first
-			MethodInfo targetMethodInfo = FindMethod(argTypes);
+			MethodInfo targetMethodInfo = FindMethod(TargetObject, MethodName, argTypes);
 			// fuzzy matching
 			if (targetMethodInfo==null) {
-				var methods = GetAllMethods();
+				var methods = GetAllMethods(TargetObject);
 
 				foreach (var m in methods)
 					if (m.Name==MethodName &&
@@ -92,7 +92,7 @@ namespace NReco {
 				throw new MissingMemberException(
 						(TargetObject is Type ? (Type)TargetObject : TargetObject.GetType()).FullName+"."+MethodName );
 			}
-			object[] argValues = PrepareActualValues(targetMethodInfo.GetParameters(),args);
+			object[] argValues = PrepareActualValues(MethodName,targetMethodInfo.GetParameters(),args);
 			object res = null;
 			try {
 				res = targetMethodInfo.Invoke( TargetObject is Type ? null : TargetObject, argValues);
@@ -143,7 +143,7 @@ namespace NReco {
 		}
 
 
-		protected object[] PrepareActualValues(ParameterInfo[] paramsInfo, object[] values) {
+		protected object[] PrepareActualValues(string MethodName, ParameterInfo[] paramsInfo, object[] values) {
 			object[] res = new object[paramsInfo.Length];
 			for (int i=0; i<paramsInfo.Length; i++) {
 				if (values[i]==null || IsInstanceOfType( paramsInfo[i].ParameterType, values[i])) {

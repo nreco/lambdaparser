@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Diagnostics;
-using System.Text;
-
 using Xunit;
 
 namespace NReco.Linq.Tests {
@@ -130,6 +128,23 @@ namespace NReco.Linq.Tests {
 			Assert.Equal(new TimeSpan(1,0,0,0), lambdaParser.Eval("twoDays + -oneDay", varContext));
 			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("oneDay - twoDays", varContext));
 			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("-twoDays + oneDay", varContext));
+
+			//Use new invoker
+			lambdaParser = new LambdaParser(OptionsParamsInvokeMethod.Instance);
+
+			Assert.True((bool)lambdaParser.Eval("testObj.OptionalParam(true,true)", varContext));
+            Assert.False((bool)lambdaParser.Eval("testObj.OptionalParam(true,true,false)", varContext));
+
+            Assert.True((bool)lambdaParser.Eval("testObj.OptionalParam2(true,true)", varContext));
+            Assert.False((bool)lambdaParser.Eval("testObj.OptionalParam2(true,true,true,\"fail\")", varContext));
+
+            Assert.True((bool)lambdaParser.Eval("testObj.TestShadowMethod()", varContext));
+
+			Assert.True((bool)lambdaParser.Eval("testObj.TestShadowProperty", varContext));
+
+			Assert.Equal("Test123ThisIsaTest",(string)lambdaParser.Eval("testObj.ParamMethodTest(\"Test\",123,\"This\",\"Is\",\"a\",\"Test\")", varContext));
+			Assert.Equal("Today is Saturday, Day 9 of December",lambdaParser.Eval("testObj.Format(\"Today is {0}, Day {1} of {2}\",\"Saturday\",9,\"December\")", varContext));
+			
 		}
 
 		[Fact]
@@ -196,7 +211,19 @@ namespace NReco.Linq.Tests {
 		}
 
 
-		public class TestClass {
+		public class TestBaseClass
+		{
+
+			public bool TestShadowMethod()
+			{
+				return false;
+			}
+
+			public int TestShadowProperty { get { return 0; } }
+
+		}
+
+		public class TestClass : TestBaseClass {
 
 			public int IntProp { get { return 1; } }
 
@@ -233,6 +260,32 @@ namespace NReco.Linq.Tests {
 				};
 			}
 
+			public bool OptionalParam(bool First, bool Second, bool Third = true) 			
+			{
+				return First & Second & Third;
+			}
+
+            public bool OptionalParam2(bool First, bool Second, bool Third = true, string Forth = "pass")
+            {
+                return First & Second & Third & Forth == "pass";
+            }
+
+            public new bool TestShadowMethod()
+            {
+				return true;
+            }
+
+			public new bool TestShadowProperty { get { return true; } }
+
+			public string ParamMethodTest(string First, int Second, params string[] args)
+			{
+				return string.Concat(First, Second) + string.Concat(args);
+			}
+
+			public string Format(string format,params object[] args)
+            {
+				return String.Format(format, args);
+            }
 
 		}
 
