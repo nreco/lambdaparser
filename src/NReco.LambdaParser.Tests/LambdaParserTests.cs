@@ -129,6 +129,9 @@ namespace NReco.Linq.Tests {
 			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("oneDay - twoDays", varContext));
 			Assert.Equal(new TimeSpan(1,0,0,0).Negate(), lambdaParser.Eval("-twoDays + oneDay", varContext));
 
+			//Use new invoker
+			lambdaParser = new LambdaParser(OptionsParamsInvokeMethod.Instance);
+
 			Assert.True((bool)lambdaParser.Eval("testObj.OptionalParam(true,true)", varContext));
             Assert.False((bool)lambdaParser.Eval("testObj.OptionalParam(true,true,false)", varContext));
 
