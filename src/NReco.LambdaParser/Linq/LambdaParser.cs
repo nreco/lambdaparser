@@ -21,7 +21,6 @@ using System.Reflection;
 using System.ComponentModel;
 using System.Globalization;
 
-
 namespace NReco.Linq {
 	
 	/// <summary>

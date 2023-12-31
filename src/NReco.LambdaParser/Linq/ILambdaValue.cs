@@ -18,13 +18,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NReco.Linq
-{
+namespace NReco.Linq {
+
 	/// <summary>
 	/// Represents a value in expressions produced by <see cref="LambdaParser"/>.
 	/// </summary>
 	public interface ILambdaValue {
 		object Value { get; }
-    }
+	}
 
 }

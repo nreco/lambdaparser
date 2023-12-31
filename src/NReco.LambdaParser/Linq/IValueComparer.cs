@@ -18,8 +18,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NReco.Linq
-{
+namespace NReco.Linq {
+
 	/// <summary>
 	/// Exposes a method that compares two objects.
 	/// </summary>
@@ -34,6 +34,6 @@ namespace NReco.Linq
 		/// </summary>
 		/// <returns>A signed integer that indicates the relative values of x and y or null if values cannot be compared.</returns>
 		int? Compare(object x, object y);
-    }
+	}
 
 }

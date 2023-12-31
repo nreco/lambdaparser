@@ -108,9 +108,9 @@ namespace NReco.Linq {
 
 			var delegParams =
 				#if NET40
-				 deleg.Method.GetParameters();
+					deleg.Method.GetParameters();
 				#else
-				 deleg.GetMethodInfo().GetParameters();
+					deleg.GetMethodInfo().GetParameters();
 				#endif
 			if (delegParams.Length != args.Length)
 				throw new TargetParameterCountException(
@@ -120,7 +120,7 @@ namespace NReco.Linq {
 			for (int i = 0; i < resolvedArgs.Length; i++) {
 				var argObj = args[i] is LambdaParameterWrapper ? ((LambdaParameterWrapper)args[i]).Value : args[i];
 				//Static method call below, what should we do with this? Perhaps we should move it somewhere else
-				if (!NReco.OptionsParamsInvokeMethod.IsInstanceOfType(delegParams[i].ParameterType, argObj))
+				if (!NReco.InvokeMethod.IsInstanceOfType(delegParams[i].ParameterType, argObj))
 					argObj = Convert.ChangeType(argObj, delegParams[i].ParameterType, CultureInfo.InvariantCulture);
 				resolvedArgs[i] = argObj;
 			}
@@ -134,33 +134,33 @@ namespace NReco.Linq {
 				obj = ((LambdaParameterWrapper)obj).Value;
 
 			//Additional check since obj appears to still be null in some use cases
-            if (obj == null)
-                throw new NullReferenceException(String.Format("Property or field {0} target is null", propertyName));
+			if (obj == null)
+				throw new NullReferenceException(String.Format("Property or field {0} target is null", propertyName));
 
             
-            PropertyInfo prop;
-            try
-            {
+			PropertyInfo prop;
+			try
+			{
 				#if NET40
 					prop = obj.GetType().GetProperty(propertyName);
 				#else
 					prop = obj.GetType().GetRuntimeProperty(propertyName);
 				#endif
-            }
+			}
 			//Below covers an issue caused by properties declared in base classes with different signitures
 			//in these cases an AmbiguousMatchException is thrown
 			//if this happens then we look for the first match by propertyName since this
 			//seems to be the one from the decendant class.
 			catch (System.Reflection.AmbiguousMatchException)
-            {
+			{
 				#if NET40
 					prop = obj.GetType().GetProperties().FirstOrDefault(rp=>rp.Name == propertyName);
 				#else
 					prop = obj.GetType().GetRuntimeProperties().FirstOrDefault(rp=>rp.Name == propertyName);
 				#endif
-            }
+			}
 
-            if (prop != null) {
+			if (prop != null) {
 				var propVal = prop.GetValue(obj, null);
 				return new LambdaParameterWrapper(propVal, Cmp, Inv);
 			}

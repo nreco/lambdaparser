@@ -18,20 +18,15 @@ using System.Collections;
 using System.Text;
 using System.Reflection;
 
-namespace NReco {
+namespace NReco.Linq {
 	
 	/// <summary>
 	/// Invoke object's method that is most compatible with provided arguments
 	/// </summary>
-	public class OptionsParamsInvokeMethod : Linq.IInvokeMethod {
+	public class OptionsParamsInvokeMethod : IInvokeMethod {
 
 		internal readonly static OptionsParamsInvokeMethod _Instance = new OptionsParamsInvokeMethod();
-		public static Linq.IInvokeMethod Instance
-		{
-			get	{
-				return _Instance;
-			}
-		}
+		public static IInvokeMethod Instance => _Instance;
 
 		protected MethodInfo FindMethod(object TargetObject, string MethodName, Type[] argTypes) {
 			if (TargetObject is Type) {
@@ -74,18 +69,18 @@ namespace NReco {
 		}
 
 
-        public object Invoke(object TargetObject, string MethodName, object[] args) {
+		public object Invoke(object targetObject, string methodName, object[] args) {
 			Type[] argTypes = new Type[args.Length];
 			for (int i = 0; i < argTypes.Length; i++)
 				argTypes[i] = args[i] != null ? args[i].GetType() : typeof(object);
 
 			// strict matching first
-			MethodInfo targetMethodInfo = FindMethod(TargetObject, MethodName, argTypes);
+			MethodInfo targetMethodInfo = FindMethod(targetObject, methodName, argTypes);
 			// fuzzy matching
 			if (targetMethodInfo==null) {
-				var methods = GetAllMethods(TargetObject);
+				var methods = GetAllMethods(targetObject);
 				foreach (var m in methods) {
-					if (m.Name == MethodName) {
+					if (m.Name == methodName) {
 						var para = m.GetParameters();
 						var paracnt = para.Length;
 						var optcnt = OptionalParameterCount(para);
@@ -104,12 +99,12 @@ namespace NReco {
 					argTypeNames[i] = argTypes[i].Name;
 				string argTypeNamesStr = String.Join(",",argTypeNames);
 				throw new MissingMemberException(
-						(TargetObject is Type ? (Type)TargetObject : TargetObject.GetType()).FullName+"."+MethodName);
+						(targetObject is Type ? (Type)targetObject : targetObject.GetType()).FullName+"."+methodName);
 			}
-			object[] argValues = PrepareActualValues(MethodName,targetMethodInfo.GetParameters(),args);
+			object[] argValues = PrepareActualValues(methodName,targetMethodInfo.GetParameters(),args);
 			object res = null;
 			try {
-				res = targetMethodInfo.Invoke( TargetObject is Type ? null : TargetObject, argValues);
+				res = targetMethodInfo.Invoke( targetObject is Type ? null : targetObject, argValues);
 			} catch (TargetInvocationException tiEx) {
 				if (tiEx.InnerException!=null)
 					throw new Exception(tiEx.InnerException.Message, tiEx.InnerException);
@@ -170,7 +165,7 @@ namespace NReco {
 					else {
 						if (!CheckParamValueCompatibility(paramType, values[i])) return false;
 					}
-                }
+				}
 				else {
 					if (!paramsInfo[i].IsOptional) return false;
 				}
