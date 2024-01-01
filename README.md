@@ -1,6 +1,8 @@
 # NReco LambdaParser
 Runtime parser for string expressions (formulas, method calls, properties/fields/arrays accessors). `LambdaParser` builds dynamic LINQ expression tree and compiles it to the lambda delegate. Types are resolved at run-time like in dynamic languages. 
 
+NuGet | Windows x64 | Linux
+--- | --- | ---
 [![NuGet Release](https://img.shields.io/nuget/v/NReco.LambdaParser.svg)](https://www.nuget.org/packages/NReco.LambdaParser/) | [![AppVeyor](https://img.shields.io/appveyor/ci/nreco/lambdaparser/master.svg)](https://ci.appveyor.com/project/nreco/lambdaparser) | ![Tests](https://github.com/nreco/data/actions/workflows/dotnet-test.yml/badge.svg) 
 
 * can be used in *any* .NET app: net45 (legacy .NET Framework apps), netstandard1.3 (.NET Core apps), netstandard2.0 (all modern .NET apps).
