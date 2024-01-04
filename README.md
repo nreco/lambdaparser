@@ -3,7 +3,7 @@ Runtime parser for string expressions (formulas, method calls, properties/fields
 
 NuGet | Windows x64 | Linux
 --- | --- | ---
-[![NuGet Release](https://img.shields.io/nuget/v/NReco.LambdaParser.svg)](https://www.nuget.org/packages/NReco.LambdaParser/) | [![AppVeyor](https://img.shields.io/appveyor/ci/nreco/lambdaparser/master.svg)](https://ci.appveyor.com/project/nreco/lambdaparser) | ![Tests](https://github.com/nreco/data/actions/workflows/dotnet-test.yml/badge.svg) 
+[![NuGet Release](https://img.shields.io/nuget/v/NReco.LambdaParser.svg)](https://www.nuget.org/packages/NReco.LambdaParser/) | [![AppVeyor](https://img.shields.io/appveyor/ci/nreco/lambdaparser/master.svg)](https://ci.appveyor.com/project/nreco/lambdaparser) | ![Tests](https://github.com/nreco/lambdaparser/actions/workflows/dotnet-test.yml/badge.svg) 
 
 * can be used in *any* .NET app: net45 (legacy .NET Framework apps), netstandard1.3 (.NET Core apps), netstandard2.0 (all modern .NET apps).
 * any number of expression arguments (values can be provided as dictionary or by callback delegate)
@@ -43,6 +43,6 @@ var lambdaParser = new LambdaParser(valComparer);
 NReco.LambdaParser is in production use at [SeekTable.com](https://www.seektable.com/) and [PivotData microservice](https://www.nrecosite.com/pivotdata_service.aspx) (used for user-defined calculated cube members: formulas, custom formatting).
 
 ## License
-Copyright 2016-2023 Vitaliy Fedorchenko
+Copyright 2016-2024 Vitaliy Fedorchenko and contributors
 
 Distributed under the MIT license

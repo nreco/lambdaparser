@@ -66,6 +66,10 @@ namespace NReco.Linq {
 		/// </summary>
 		public IInvokeMethod Invoker { get; private set; }
 
+		LambdaParameterWrapperContext _LambdaParamCtx = null;
+		LambdaParameterWrapperContext LambdaParamCtx => _LambdaParamCtx ??
+			(_LambdaParamCtx = new LambdaParameterWrapperContext(Comparer, Invoker));
+
 		public LambdaParser() {
 			UseCache = true;
 			AllowSingleEqualSign = false;
@@ -141,7 +145,7 @@ namespace NReco.Linq {
 
 			var valuesList = new List<object>();
 			foreach (var paramExpr in compiledExpr.Parameters) {
-				valuesList.Add( new LambdaParameterWrapper( getVarValue(paramExpr.Name), Comparer, Invoker) );
+				valuesList.Add( new LambdaParameterWrapper( getVarValue(paramExpr.Name), LambdaParamCtx) );
 			}
 
 			var lambdaRes = compiledExpr.Lambda.DynamicInvoke(valuesList.ToArray());
@@ -243,12 +247,8 @@ namespace NReco.Linq {
 		}
 
 
-		static readonly ConstructorInfo LambdaParameterWrapperConstructor = 
-			#if NET40
-			typeof(LambdaParameterWrapper).GetConstructor(new[] { typeof(object) });
-			#else
-			typeof(LambdaParameterWrapper).GetTypeInfo().DeclaredConstructors.First();
-#endif
+		static readonly ConstructorInfo LambdaParameterWrapperConstructor =
+			typeof(LambdaParameterWrapper).GetTypeInfo().GetConstructor(new[] { typeof(object), typeof(LambdaParameterWrapperContext) });
 
 		protected ParseVarResult ParseVar(string expr, int start, Variables vars) {
 			var varLexem = ReadLexem(expr, start);
@@ -271,10 +271,9 @@ namespace NReco.Linq {
 					Expr = Expression.Assign(
 						varParamExpr,
 						Expression.New(
-							typeof(LambdaParameterWrapper).GetConstructor(new[] {typeof(object),typeof(IValueComparer),typeof(IInvokeMethod)}),
+							LambdaParameterWrapperConstructor,
 							Expression.TypeAs(varValExpr.Expr, typeof(object)),
-							Expression.Constant(Comparer, typeof(IValueComparer)),
-							Expression.Constant(Invoker, typeof(IInvokeMethod))
+							Expression.Constant(LambdaParamCtx, typeof(LambdaParameterWrapperContext))
 						)),
 					End = varEndLexem.End
 				};
@@ -293,16 +292,14 @@ namespace NReco.Linq {
 				var positiveOp = ParseOr(expr, ifLexem.End, vars);
 				var positiveOpExpr = Expression.New(LambdaParameterWrapperConstructor, 
 						Expression.Convert(positiveOp.Expr,typeof(object)),
-						Expression.Constant(Comparer),
-						Expression.Constant(Invoker));
+						Expression.Constant(LambdaParamCtx, typeof(LambdaParameterWrapperContext)));
 
 				var elseLexem = ReadLexem(expr, positiveOp.End);
 				if (elseLexem.Type == LexemType.Delimiter && elseLexem.GetValue() == ":") {
 					var negativeOp = ParseConditional(expr, elseLexem.End, vars);
 					var negativeOpExpr = Expression.New(LambdaParameterWrapperConstructor, 
 							Expression.Convert( negativeOp.Expr, typeof(object)),
-							Expression.Constant(Comparer),
-							Expression.Constant(Invoker));
+							Expression.Constant(LambdaParamCtx, typeof(LambdaParameterWrapperContext)));
 					return new ParseResult() {
 						End = negativeOp.End,
 						Expr = Expression.Condition( Expression.IsTrue( testExpr.Expr ), positiveOpExpr, negativeOpExpr)
@@ -519,12 +516,7 @@ namespace NReco.Linq {
 		}
 
 		private static MethodInfo GetLambdaParameterWrapperMethod(string methodName) {
-			#if NET40
-			return typeof(LambdaParameterWrapper).GetMethod(methodName,
-				BindingFlags.Instance | BindingFlags.Public);
-			#else
 			return typeof(LambdaParameterWrapper).GetTypeInfo().DeclaredMethods.Where(m=>m.Name==methodName).First();
-			#endif
 		}
 
 		static readonly MethodInfo InvokeMethodMI = GetLambdaParameterWrapperMethod("InvokeMethod");
@@ -553,7 +545,7 @@ namespace NReco.Linq {
 								val = new ParseResult() {
 									End = paramsEnd,
 									Expr = Expression.Call(
-										Expression.Constant(new LambdaParameterWrapper(null, Comparer, Invoker)),
+										Expression.Constant(new LambdaParameterWrapper(null, LambdaParamCtx)),
 										InvokeMethodMI, 
 										val.Expr, 
 										Expression.Constant(memberLexem.GetValue()),
@@ -565,7 +557,7 @@ namespace NReco.Linq {
 								val = new ParseResult() {
 									End = memberLexem.End,
 									Expr = Expression.Call(
-										Expression.Constant(new LambdaParameterWrapper(null, Comparer, Invoker)),
+										Expression.Constant(new LambdaParameterWrapper(null, LambdaParamCtx)),
 										InvokePropertyOrFieldMI,
 										val.Expr, Expression.Constant(memberLexem.GetValue()))
 								};
@@ -578,7 +570,7 @@ namespace NReco.Linq {
 						val = new ParseResult() {
 							End = paramsEnd,
 							Expr = Expression.Call(
-								Expression.Constant(new LambdaParameterWrapper(null, Comparer, Invoker)),
+								Expression.Constant(new LambdaParameterWrapper(null, LambdaParamCtx)),
 								InvokeIndexerMI, val.Expr, 
 								Expression.NewArrayInit(typeof(object), indexerParams)
 							)
@@ -591,7 +583,7 @@ namespace NReco.Linq {
 						val = new ParseResult() {
 							End = paramsEnd,
 							Expr = Expression.Call(
-								Expression.Constant(new LambdaParameterWrapper(null, Comparer, Invoker)),
+								Expression.Constant(new LambdaParameterWrapper(null, LambdaParamCtx)),
 								InvokeDelegateMI, 
 								val.Expr, paramsExpr)
 						};
@@ -646,21 +638,21 @@ namespace NReco.Linq {
 				}
 				return new ParseResult() { 
 					End = lexem.End, 
-					Expr = Expression.Constant(new LambdaParameterWrapper( numConst, Comparer, Invoker) ) };
+					Expr = Expression.Constant(new LambdaParameterWrapper( numConst, LambdaParamCtx) ) };
 			} else if (lexem.Type == LexemType.StringConstant) {
 				return new ParseResult() { 
 					End = lexem.End, 
-					Expr = Expression.Constant( new LambdaParameterWrapper( lexem.GetValue(), Comparer, Invoker) ) };
+					Expr = Expression.Constant( new LambdaParameterWrapper( lexem.GetValue(), LambdaParamCtx) ) };
 			} else if (lexem.Type == LexemType.Name) {
 				// check for predefined constants
 				var val = lexem.GetValue();
 				switch (val) {
 					case "true":
-						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(true, Comparer, Invoker) ) };
+						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(true, LambdaParamCtx) ) };
 					case "false":
-						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(false, Comparer, Invoker) ) };
+						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(false, LambdaParamCtx) ) };
 					case "null":
-						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(null, Comparer, Invoker)) };
+						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(null, LambdaParamCtx)) };
 					case "new":
 						return ReadNewInstance(expr, lexem.End, vars);
 				}
@@ -692,8 +684,7 @@ namespace NReco.Linq {
 					End = end,
 					Expr = Expression.New(LambdaParameterWrapperConstructor, 
 						Expression.Convert(newArrExpr, typeof(object)),
-						Expression.Constant(Comparer),
-						Expression.Constant(Invoker)) 
+						Expression.Constant(LambdaParamCtx, typeof(LambdaParameterWrapperContext)))
 				};
 			}
 			if (nextLexem.Type == LexemType.Name && nextLexem.GetValue().ToLower() == "dictionary") {
@@ -727,7 +718,7 @@ namespace NReco.Linq {
 				return new ParseResult() {
 					End = nextLexem.End,
 					Expr = Expression.Call(
-						Expression.Constant(new LambdaParameterWrapper(null, Comparer, Invoker)),
+						Expression.Constant(new LambdaParameterWrapper(null, LambdaParamCtx)),
 						CreateDictionaryMI,
 						newKeysArrExpr, newValuesArrExpr)
 				};

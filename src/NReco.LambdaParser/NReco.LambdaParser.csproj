@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿ <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Runtime expressions parser and evaluator (formulas, conditions, method calls, properties/indexers etc). Builds LINQ expression tree and compiles it to lambda delegate with full support of dynamically typed variables.</Description>
@@ -8,7 +8,6 @@
     <VersionPrefix>1.1.0</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
 	<TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
-	<!--TargetFrameworks>netstandard2.0;netstandard1.3;portable-net45+win8+wpa81+wp8;portable-net40+sl5+win8+wpa81+wp8</TargetFrameworks-->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>NReco.LambdaParser</AssemblyName>
     <AssemblyOriginatorKeyFile>NReco.LambdaParser.snk</AssemblyOriginatorKeyFile>
@@ -64,64 +63,8 @@ v.1.0.6 changes:
 	
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8'">
-    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
-    <NugetTargetMoniker>.NETPortable,Version=v0.0,Profile=Profile259</NugetTargetMoniker>
-    <LanguageTargets>$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets</LanguageTargets>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'portable-net40+sl5+win8+wpa81+wp8'">
-    <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
-    <NugetTargetMoniker>.NETPortable,Version=v0.0,Profile=Profile328</NugetTargetMoniker>
-    <LanguageTargets>$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets</LanguageTargets>
-    <DefineConstants>$(DefineConstants);NET40</DefineConstants>	
-  </PropertyGroup>
-  
-  <ItemGroup Condition=" '$(TargetFramework)' == 'portable45-net45+win8+wp8+wpa81' ">
-	<Reference Include="System" />
-	<Reference Include="System.Collections" />
-	<Reference Include="System.Core" />
-	<Reference Include="System.IO" />
-	<Reference Include="System.Reflection" />
-	<Reference Include="System.Linq" />
-	<Reference Include="System.Linq.Expressions" />
-	<Reference Include="System.Runtime" />
-	<Reference Include="System.Resources.ResourceManager" />
-	<Reference Include="System.Reflection.Extensions" />
-	<Reference Include="System.Globalization" />
-	<Reference Include="System.Runtime.Extensions" />
-	<Reference Include="System.Threading" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'portable-net45+win8+wpa81+wp8' ">
-	<Reference Include="System.Core" />
-	<Reference Include="System" />
-	<Reference Include="System.Collections"/>
-	<Reference Include="System.IO"/>
-	<Reference Include="System.Reflection"/>
-	<Reference Include="System.Linq"/>
-	<Reference Include="System.Linq.Expressions"/>
-	<Reference Include="System.Runtime"/>	
-	<Reference Include="System.Resources.ResourceManager"/>	
-	<Reference Include="System.Reflection.Extensions"/>
-	<Reference Include="System.Globalization"/>	
-	<Reference Include="System.Runtime.Extensions"/>
-	<Reference Include="System.Threading"/>	
-  </ItemGroup>   
-  
-  <ItemGroup Condition=" '$(TargetFramework)' == 'portable-net40+sl5+win8+wpa81+wp8' ">
-	<Reference Include="mscorlib" />
-	<Reference Include="System.Core" />
-	<Reference Include="System" />
-  </ItemGroup> 
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
   </ItemGroup>
-
-  <Target Name="_GetRestoreSettingsPerFramework"></Target>
   
 </Project>

@@ -18,66 +18,45 @@ using System.Collections;
 using System.Text;
 using System.Reflection;
 
-namespace NReco {
+namespace NReco.Linq {
 	
 	/// <summary>
 	/// Invoke object's method that is most compatible with provided arguments
 	/// </summary>
-	internal class InvokeMethod : Linq.IInvokeMethod {
+	public class InvokeMethod : IInvokeMethod {
 
 		internal readonly static InvokeMethod _Instance = new InvokeMethod();
 
-		public static Linq.IInvokeMethod Instance
-		{
-			get	{
-				return _Instance;
-			}
-		}
+		public static Linq.IInvokeMethod Instance => _Instance;
 
-		protected MethodInfo FindMethod(object TargetObject, string MethodName, Type[] argTypes) {
-			if (TargetObject is Type) {
+		protected MethodInfo FindMethod(object targetObject, string methodName, Type[] argTypes) {
+			if (targetObject is Type) {
 				// static method
-				#if NET40
-				return ((Type)TargetObject).GetMethod(MethodName, BindingFlags.Static | BindingFlags.Public);
-				#else
-				return ((Type)TargetObject).GetRuntimeMethod(MethodName, argTypes);
-				#endif
+				return ((Type)targetObject).GetRuntimeMethod(methodName, argTypes);
 			}
-			#if NET40
-			return TargetObject.GetType().GetMethod(MethodName, argTypes);
-			#else
-			return TargetObject.GetType().GetRuntimeMethod(MethodName, argTypes);
-			#endif
+			return targetObject.GetType().GetRuntimeMethod(methodName, argTypes);
 		}
 
-		protected IEnumerable<MethodInfo> GetAllMethods(object TargetObject) {
-			if (TargetObject is Type) {
-				#if NET40
-				return ((Type)TargetObject).GetMethods(BindingFlags.Static | BindingFlags.Public);
-				#else
-				return ((Type)TargetObject).GetRuntimeMethods();
-				#endif
+		protected IEnumerable<MethodInfo> GetAllMethods(object targetObject) {
+			if (targetObject is Type) {
+				return ((Type)targetObject).GetRuntimeMethods();
 			}
-			#if NET40
-			return TargetObject.GetType().GetMethods();
-			#else
-			return TargetObject.GetType().GetRuntimeMethods();
-			#endif
+			return targetObject.GetType().GetRuntimeMethods();
 		}
 
-		public object Invoke(object TargetObject, string MethodName, object[] args) {
+		public object Invoke(object targetObject, string methodName, object[] args) {
 			Type[] argTypes = new Type[args.Length];
 			for (int i = 0; i < argTypes.Length; i++)
 				argTypes[i] = args[i] != null ? args[i].GetType() : typeof(object);
 
 			// strict matching first
-			MethodInfo targetMethodInfo = FindMethod(TargetObject, MethodName, argTypes);
+			MethodInfo targetMethodInfo = FindMethod(targetObject, methodName, argTypes);
 			// fuzzy matching
 			if (targetMethodInfo==null) {
-				var methods = GetAllMethods(TargetObject);
+				var methods = GetAllMethods(targetObject);
 
 				foreach (var m in methods)
-					if (m.Name==MethodName &&
+					if (m.Name==methodName &&
 						m.GetParameters().Length == args.Length &&
 						CheckParamsCompatibility(m.GetParameters(), argTypes, args)) {
 						targetMethodInfo = m;
@@ -90,12 +69,12 @@ namespace NReco {
 					argTypeNames[i] = argTypes[i].Name;
 				string argTypeNamesStr = String.Join(",",argTypeNames);
 				throw new MissingMemberException(
-						(TargetObject is Type ? (Type)TargetObject : TargetObject.GetType()).FullName+"."+MethodName );
+						(targetObject is Type ? (Type)targetObject : targetObject.GetType()).FullName+"."+methodName );
 			}
-			object[] argValues = PrepareActualValues(MethodName,targetMethodInfo.GetParameters(),args);
+			object[] argValues = PrepareActualValues(methodName,targetMethodInfo.GetParameters(),args);
 			object res = null;
 			try {
-				res = targetMethodInfo.Invoke( TargetObject is Type ? null : TargetObject, argValues);
+				res = targetMethodInfo.Invoke( targetObject is Type ? null : targetObject, argValues);
 			} catch (TargetInvocationException tiEx) {
 				if (tiEx.InnerException!=null)
 					throw new Exception(tiEx.InnerException.Message, tiEx.InnerException);
@@ -107,11 +86,7 @@ namespace NReco {
 		}
 
 		internal static bool IsInstanceOfType(Type t, object val) {
-			#if NET40 
-			return t.IsInstanceOfType(val);
-			#else
 			return val!=null && t.GetTypeInfo().IsAssignableFrom(val.GetType().GetTypeInfo());
-			#endif
 		}
 
 		protected bool CheckParamsCompatibility(ParameterInfo[] paramsInfo, Type[] types, object[] values) {
@@ -121,13 +96,7 @@ namespace NReco {
 				if (IsInstanceOfType(paramType, val))
 					continue;
 				// null and reference types
-				if (val==null && 
-					#if NET40
-					!paramType.IsValueType
-					#else 
-					!paramType.GetTypeInfo().IsValueType
-					#endif
-				)
+				if (val==null && !paramType.GetTypeInfo().IsValueType)
 					continue;
 				// possible autocast between generic/non-generic common types
 				try {
@@ -143,7 +112,7 @@ namespace NReco {
 		}
 
 
-		protected object[] PrepareActualValues(string MethodName, ParameterInfo[] paramsInfo, object[] values) {
+		protected object[] PrepareActualValues(string methodName, ParameterInfo[] paramsInfo, object[] values) {
 			object[] res = new object[paramsInfo.Length];
 			for (int i=0; i<paramsInfo.Length; i++) {
 				if (values[i]==null || IsInstanceOfType( paramsInfo[i].ParameterType, values[i])) {
@@ -156,7 +125,7 @@ namespace NReco {
 				} catch { 
 					throw new InvalidCastException( 
 						String.Format("Invoke method '{0}': cannot convert argument #{1} from {2} to {3}",
-							MethodName, i, values[i].GetType(), paramsInfo[i].ParameterType));
+							methodName, i, values[i].GetType(), paramsInfo[i].ParameterType));
 				}
 			}
 			return res;

@@ -28,35 +28,19 @@ namespace NReco.Linq {
 		internal readonly static OptionsParamsInvokeMethod _Instance = new OptionsParamsInvokeMethod();
 		public static IInvokeMethod Instance => _Instance;
 
-		protected MethodInfo FindMethod(object TargetObject, string MethodName, Type[] argTypes) {
-			if (TargetObject is Type) {
+		protected MethodInfo FindMethod(object targetObject, string methodName, Type[] argTypes) {
+			if (targetObject is Type) {
 				// static method
-				#if NET40
-				return ((Type)TargetObject).GetMethod(MethodName, BindingFlags.Static | BindingFlags.Public);
-				#else
-				return ((Type)TargetObject).GetRuntimeMethod(MethodName, argTypes);
-				#endif
+				return ((Type)targetObject).GetRuntimeMethod(methodName, argTypes);
 			}
-			#if NET40
-			return TargetObject.GetType().GetMethod(MethodName, argTypes);
-			#else
-			return TargetObject.GetType().GetRuntimeMethod(MethodName, argTypes);
-			#endif
+			return targetObject.GetType().GetRuntimeMethod(methodName, argTypes);
 		}
 
-		protected IEnumerable<MethodInfo> GetAllMethods(object TargetObject) {
-			if (TargetObject is Type) {
-				#if NET40
-				return ((Type)TargetObject).GetMethods(BindingFlags.Static | BindingFlags.Public);
-				#else
-				return ((Type)TargetObject).GetRuntimeMethods();
-				#endif
+		protected IEnumerable<MethodInfo> GetAllMethods(object targetObject) {
+			if (targetObject is Type) {
+				return ((Type)targetObject).GetRuntimeMethods();
 			}
-			#if NET40
-			return TargetObject.GetType().GetMethods();
-			#else
-			return TargetObject.GetType().GetRuntimeMethods();
-			#endif
+			return targetObject.GetType().GetRuntimeMethods();
 		}
 
 
@@ -115,27 +99,12 @@ namespace NReco.Linq {
 			return res;
 		}
 
-		internal static bool IsInstanceOfType(Type t, object val) {
-			#if NET40 
-			return t.IsInstanceOfType(val);
-			#else
-			return val!=null && t.GetTypeInfo().IsAssignableFrom(val.GetType().GetTypeInfo());
-			#endif
-		}
-
-
 		private bool CheckParamValueCompatibility(Type paramType, object val)
 		{
-			if (IsInstanceOfType(paramType, val))
+			if (InvokeMethod.IsInstanceOfType(paramType, val))
 				return true;
 			// null and reference types
-			if (val == null &&
-				#if NET40
-					!paramType.IsValueType
-				#else
-					!paramType.GetTypeInfo().IsValueType
-				#endif
-				)
+			if (val == null && !paramType.GetTypeInfo().IsValueType)
 				return true;
 			// possible autocast between generic/non-generic common types
 			try {
@@ -174,7 +143,7 @@ namespace NReco.Linq {
 		}
 
 		private object PrepareActualValue(Type paramType, object value) {
-			if (value == null || IsInstanceOfType(paramType, value)) {
+			if (value == null || InvokeMethod.IsInstanceOfType(paramType, value)) {
 				return value;
 			}
 			return Convert.ChangeType(value, paramType, System.Globalization.CultureInfo.InvariantCulture);
