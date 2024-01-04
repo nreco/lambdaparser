@@ -1,11 +1,14 @@
 ﻿ <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Runtime expressions parser and evaluator (formulas, conditions, method calls, properties/indexers etc). Builds LINQ expression tree and compiles it to lambda delegate with full support of dynamically typed variables.</Description>
+    <Description>Runtime expressions parser and evaluator (formulas, conditions, method calls, properties/indexers etc). Builds LINQ expression tree and compiles it to lambda delegate with full support of dynamically typed variables.
+	
+Source code and examples: https://github.com/nreco/lambdaparser	
+</Description>
 	<Title>Dynamic expressions evaluator</Title>
-    <Copyright>Copyright (c) 2013-2023 Vitalii Fedorchenko</Copyright>
+    <Copyright>Copyright (c) 2013-2024 Vitalii Fedorchenko</Copyright>
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>1.1.1</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
 	<TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -14,7 +17,11 @@
     <SignAssembly>False</SignAssembly>
     <PackageId>NReco.LambdaParser</PackageId>
     <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;netstandard;netcore;net45;</PackageTags>
-	<PackageReleaseNotes>Source code and examples: https://github.com/nreco/lambdaparser
+	<PackageReleaseNotes>
+v.1.1.1 changes:
+- added support for optional parameters in method calls #44 (via OptionsParamsInvokeMethod impl)	
+- added support for 'params' arguments in method calls #45 (via OptionsParamsInvokeMethod impl)
+	
 v.1.1.0 changes:
 - variables in expressions #42 (to enable use LambdaParser.AllowVars)	
 - Sequence of ternary operators #43
