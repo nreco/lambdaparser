@@ -248,7 +248,7 @@ namespace NReco.Linq {
 
 
 		static readonly ConstructorInfo LambdaParameterWrapperConstructor =
-			typeof(LambdaParameterWrapper).GetTypeInfo().GetConstructor(new[] { typeof(object), typeof(LambdaParameterWrapperContext) });
+			typeof(LambdaParameterWrapper).GetConstructor(new[] { typeof(object), typeof(LambdaParameterWrapperContext) });
 
 		protected ParseVarResult ParseVar(string expr, int start, Variables vars) {
 			var varLexem = ReadLexem(expr, start);
