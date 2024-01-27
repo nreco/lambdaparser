@@ -216,6 +216,34 @@ namespace NReco.Linq.Tests {
 			Console.WriteLine("10000 iterations: {0}", sw.Elapsed);
 		}
 
+		[Fact]
+		public void MultiParameterFunc()
+		{
+		    var lambdaParser = new LambdaParser(new OptionsParamsInvokeMethod());
+	
+		    var context = getContext();
+		    context["f"] = new Funcs();
+		    context["sum"] = new Func<object, decimal>((p) =>
+		    {
+			if (p is ICollection collection)
+			{
+			    return collection.Cast<object>().Select(w =>
+			    {
+				decimal.TryParse(w?.ToString(), out var value);
+				return value;
+			    })?.Sum() ?? 0;
+			}
+	
+			decimal.TryParse(p?.ToString(), out var value1);
+			return value1;
+		    });
+	
+		    var value1 = ; //
+	
+		    Assert.Equal(13M,
+			lambdaParser.Eval("sum(1,2,3) + sum(1) + f.sum(1,2,3)", context));
+		}
+
 
 		public class TestBaseClass
 		{
@@ -295,5 +323,24 @@ namespace NReco.Linq.Tests {
 
 		}
 
+
+	    public class Funcs
+	    {
+	        public decimal sum(params object[] p)
+	        {
+	            if (p is ICollection collection)
+	            {
+	                return collection.Cast<object?>().Select(w =>
+	                {
+	                    decimal.TryParse(w?.ToString(), out var value);
+	                    return value;
+	                })?.Sum() ?? 0;
+	            }
+	
+	            return 0;
+	        }
+	    }
+
+	
 	}
 }
