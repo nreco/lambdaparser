@@ -105,15 +105,17 @@ namespace NReco.Linq {
 
 			var delegParams = deleg.GetMethodInfo().GetParameters();
 
-			// If it is a parameter and the parameter type is object (如果是一个参数 并且 参数类型是 object)
-			var isParams = delegParams.Length == 1 && delegParams[0].ParameterType == typeof(object);
-			if (isParams)
-			{
-				var resolvedArgList = args
-				    .Select(w => w is LambdaParameterWrapper ? ((LambdaParameterWrapper)w).Value : w)
-				    .ToArray();
-				return new LambdaParameterWrapper(deleg.DynamicInvoke((object)resolvedArgList), Ctx);
-			}
+	            // If it is a parameter and the parameter type is object (如果是一个参数 并且 参数类型是 object)
+	            var isParams = delegParams.Length == 1 && 
+	                           delegParams[0].ParameterType == typeof(object) &&
+	                           delegParams.Length != args.Length;
+	            if (isParams)
+	            {
+	                var resolvedArgList = args
+	                    .Select(w => w is LambdaParameterWrapper ? ((LambdaParameterWrapper)w).Value : w)
+	                    .ToArray();
+	                return new LambdaParameterWrapper(deleg.DynamicInvoke((object)resolvedArgList), Ctx);
+	            }
 			
 			if (delegParams.Length != args.Length)
 				throw new TargetParameterCountException(
