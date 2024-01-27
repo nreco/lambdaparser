@@ -238,8 +238,6 @@ namespace NReco.Linq.Tests {
 			return value1;
 		    });
 	
-		    var value1 = ; //
-	
 		    Assert.Equal(13M,
 			lambdaParser.Eval("sum(1,2,3) + sum(1) + f.sum(1,2,3)", context));
 		}
