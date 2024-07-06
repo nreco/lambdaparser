@@ -13,6 +13,7 @@
 #endregion
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -36,9 +37,8 @@ namespace NReco.Linq {
 		static readonly string[] mulOps = new[] {"*", "/", "%" };
 		static readonly string[] addOps = new[] { "+", "-" };
 		static readonly string[] eqOps = new[] { "==", "!=", "<", ">", "<=", ">=" };
-		
-		readonly IDictionary<string, CompiledExpression> CachedExpressions = new Dictionary<string, CompiledExpression>();
-		readonly object _lock = new object();
+
+		readonly IDictionary<string, CompiledExpression> CachedExpressions = new ConcurrentDictionary<string, CompiledExpression>();
 
 		/// <summary>
 		/// Gets or sets whether LambdaParser should use the cache for parsed expressions.
@@ -124,9 +124,7 @@ namespace NReco.Linq {
 		public object Eval(string expr, Func<string,object> getVarValue) {
 			CompiledExpression compiledExpr = null;
 			if (UseCache) {
-				lock (_lock) {
-					CachedExpressions.TryGetValue(expr, out compiledExpr);
-				}
+				CachedExpressions.TryGetValue(expr, out compiledExpr);
 			}
 
 			if (compiledExpr == null) {
@@ -136,11 +134,9 @@ namespace NReco.Linq {
 				};
 				var lambdaExpr = Expression.Lambda(linqExpr, compiledExpr.Parameters);
 				compiledExpr.Lambda = lambdaExpr.Compile();
-				
+
 				if (UseCache)
-					lock (_lock) {
-						CachedExpressions[expr] = compiledExpr;
-					}
+					CachedExpressions[expr] = compiledExpr;
 			}
 
 			var valuesList = new List<object>();
