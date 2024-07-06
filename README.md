@@ -38,6 +38,18 @@ By default `LambdaParser` uses `ValueComparer` for values comparison. You can pr
 var valComparer = new ValueComparer() { NullComparison = ValueComparer.NullComparisonMode.Sql };
 var lambdaParser = new LambdaParser(valComparer); 
 ```
+### Caching Expressions
+
+The `UseCache` property determines whether the `LambdaParser` should cache parsed expressions. By default, `UseCache` is set to `true`, meaning expressions are cached to improve performance for repeated evaluations of the same expression. 
+
+Therefore, using a singleton instance of `LambdaParser` is recommended, rather than creating a new instance each time.
+
+You can disable caching by setting UseCache to false if you want to save memory, especially when evaluating a large number of unique expressions.
+
+```csharp
+var lambdaParser = new LambdaParser();
+lambdaParser.UseCache = false;
+```
 
 ## Who is using this?
 NReco.LambdaParser is in production use at [SeekTable.com](https://www.seektable.com/) and [PivotData microservice](https://www.nrecosite.com/pivotdata_service.aspx) (used for user-defined calculated cube members: formulas, custom formatting).
