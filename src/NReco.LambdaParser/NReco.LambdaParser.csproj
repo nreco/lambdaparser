@@ -6,9 +6,9 @@
 Source code and examples: https://github.com/nreco/lambdaparser	
 </Description>
 	<Title>Dynamic expressions evaluator</Title>
-    <Copyright>Copyright (c) 2013-2024 Vitalii Fedorchenko</Copyright>
+    <Copyright>Copyright (c) 2013-2024 Vitalii Fedorchenko and contributors</Copyright>
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
-    <VersionPrefix>1.1.1</VersionPrefix>
+    <VersionPrefix>1.1.2</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
 	<TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -18,6 +18,9 @@ Source code and examples: https://github.com/nreco/lambdaparser
     <PackageId>NReco.LambdaParser</PackageId>
     <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;netstandard;netcore;net45;</PackageTags>
 	<PackageReleaseNotes>
+v.1.1.2 changes:
+- use concurrent dictionary to replace lock #51	
+	
 v.1.1.1 changes:
 - added support for optional parameters in method calls #44 (via OptionsParamsInvokeMethod impl)	
 - added support for 'params' arguments in method calls #45 (via OptionsParamsInvokeMethod impl)
