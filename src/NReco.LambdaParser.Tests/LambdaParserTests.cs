@@ -216,6 +216,22 @@ namespace NReco.Linq.Tests {
 			Console.WriteLine("10000 iterations: {0}", sw.Elapsed);
 		}
 
+		[Fact]
+		public void AllowNoLeadingZeroesFalse()
+		{
+			var parser = new LambdaParser { AllowNoLeadingZeroes = false };
+			var exception = Assert.Throws<LambdaParserException>(() => parser.Eval(".6", new Dictionary<string, object>()));
+			Assert.Equal(".6", exception.Expression);
+			Assert.Equal(0, exception.Index);
+		}
+		
+		[Fact]
+		public void AllowNoLeadingZeroesTrue()
+		{
+			var parser = new LambdaParser { AllowNoLeadingZeroes = true };
+			var result = parser.Eval(".6", new Dictionary<string, object>());
+			Assert.Equal(0.6m, result);
+		}
 
 		public class TestBaseClass
 		{

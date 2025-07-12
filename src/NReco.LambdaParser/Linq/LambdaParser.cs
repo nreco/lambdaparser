@@ -44,6 +44,11 @@ namespace NReco.Linq {
 		/// Gets or sets whether LambdaParser should use the cache for parsed expressions.
 		/// </summary>
 		public bool UseCache { get; set; }
+		
+		/// <summary>
+		/// Gets or sets whether LambdaParser should allow numbers without leading zeroes.
+		/// </summary>
+		public bool AllowNoLeadingZeroes { get; set; }
 
 		/// <summary>
 		/// Allows usage of "=" for equality comparison (in addition to "=="). False by default.
@@ -72,6 +77,7 @@ namespace NReco.Linq {
 
 		public LambdaParser() {
 			UseCache = true;
+			AllowNoLeadingZeroes = false;
 			AllowSingleEqualSign = false;
 			AllowVars = false;
 			Comparer = ValueComparer.Instance;
@@ -191,6 +197,14 @@ namespace NReco.Linq {
 				if (Array.IndexOf(delimiters, s[lexem.End]) >= 0) {
 					if (lexem.Type == LexemType.Unknown) {
 						lexem.End++;
+						if (AllowNoLeadingZeroes 
+								&& lexem.Start == lexem.End - 1 
+								&& s[lexem.Start] == '.' 
+								&& lexem.End < s.Length 
+								&& char.IsDigit(s[lexem.End])) {
+							lexem.Type = LexemType.NumberConstant;
+							continue;
+						}
 						lexem.Type = LexemType.Delimiter;
 						return lexem;
 					}
