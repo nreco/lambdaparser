@@ -10,3 +10,4 @@
 *.dll
 *.targets
 project.lock.json
+.idea/
