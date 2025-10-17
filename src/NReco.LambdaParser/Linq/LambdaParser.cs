@@ -614,19 +614,16 @@ namespace NReco.Linq {
 						return lexem.End;
 					} else if (lexem.GetValue() == ",") {
 						if (args.Count == 0) {
-							throw new LambdaParserException(expr, lexem.Start, "Expected method call parameter");
+							throw new LambdaParserException(expr, lexem.Start, "Value missed");
 						}
 						end = lexem.End;
+					} else {
+						throw new LambdaParserException(expr, lexem.Start, String.Format("Expected '{0}' or ','", endLexem));
 					}
 				}
 				// read parameter
 				var paramExpr = ParseConditional(expr, end, vars);
-				var argExpr = paramExpr.Expr;
-				if (!(argExpr is ConstantExpression constExpr && constExpr.Value is LambdaParameterWrapper)) {
-					// result may be a primitive type like bool
-					argExpr = Expression.Convert(argExpr, typeof(object));
-				}
-				args.Add(argExpr);
+				args.Add(ExprConvertToObjectIfNeeded(paramExpr.Expr));
 				end = paramExpr.End;
 			} while (true);
 		}
@@ -644,23 +641,25 @@ namespace NReco.Linq {
 			} else if (lexem.Type == LexemType.NumberConstant) {
 				decimal numConst;
 				if (!Decimal.TryParse(lexem.GetValue(), NumberStyles.Any, CultureInfo.InvariantCulture, out numConst)) {
-					throw new Exception(String.Format("Invalid number: {0}", lexem.GetValue())); 
+					throw new Exception(String.Format("Invalid number: {0}", lexem.GetValue()));
 				}
-				return new ParseResult() { 
-					End = lexem.End, 
-					Expr = Expression.Constant(new LambdaParameterWrapper( numConst, LambdaParamCtx) ) };
+				return new ParseResult() {
+					End = lexem.End,
+					Expr = Expression.Constant(new LambdaParameterWrapper(numConst, LambdaParamCtx))
+				};
 			} else if (lexem.Type == LexemType.StringConstant) {
-				return new ParseResult() { 
-					End = lexem.End, 
-					Expr = Expression.Constant( new LambdaParameterWrapper( lexem.GetValue(), LambdaParamCtx) ) };
+				return new ParseResult() {
+					End = lexem.End,
+					Expr = Expression.Constant(new LambdaParameterWrapper(lexem.GetValue(), LambdaParamCtx))
+				};
 			} else if (lexem.Type == LexemType.Name) {
 				// check for predefined constants
 				var val = lexem.GetValue();
 				switch (val) {
 					case "true":
-						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(true, LambdaParamCtx) ) };
+						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(true, LambdaParamCtx)) };
 					case "false":
-						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(false, LambdaParamCtx) ) };
+						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(false, LambdaParamCtx)) };
 					case "null":
 						return new ParseResult() { End = lexem.End, Expr = Expression.Constant(new LambdaParameterWrapper(null, LambdaParamCtx)) };
 					case "new":
@@ -669,9 +668,13 @@ namespace NReco.Linq {
 
 				// todo 
 				var localVarExpr = vars.Get(val);
-				return new ParseResult() { 
-					End = lexem.End, 
-					Expr = localVarExpr!=null ? localVarExpr : Expression.Parameter(typeof(LambdaParameterWrapper), val) };
+				return new ParseResult() {
+					End = lexem.End,
+					Expr = localVarExpr!=null ? localVarExpr : Expression.Parameter(typeof(LambdaParameterWrapper), val)
+				};
+			} else if (lexem.Type == LexemType.Delimiter && (lexem.GetValue() == "[" || lexem.GetValue() == "{")) {
+				// json-like array or object (dictionary) syntax
+				return ReadNewInstance(expr, lexem.Start, vars);
 			}
 			throw new LambdaParserException(expr, start, "Expected value");
 		}
@@ -680,51 +683,84 @@ namespace NReco.Linq {
 			var nextLexem = ReadLexem(expr, start);
 			if (nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "[") {
 				nextLexem = ReadLexem(expr, nextLexem.End);
-				if (!(nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "]"))
-					throw new LambdaParserException(expr, nextLexem.Start, "Expected ']'");
-
-				nextLexem = ReadLexem(expr, nextLexem.End);
-				if (!(nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "{"))
-					throw new LambdaParserException(expr, nextLexem.Start, "Expected '{'");
-
 				var arrayArgs = new List<Expression>();
-				var end = ReadCallArguments(expr, nextLexem.End, "}", arrayArgs, vars);
-				var newArrExpr = Expression.NewArrayInit(typeof(object), arrayArgs );
-				return new ParseResult() { 
+				int end;
+				if (nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "]") {
+					nextLexem = ReadLexem(expr, nextLexem.End);
+					if (nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "{")
+						// this is 'new [] { val1, val2 }'
+						end = ReadCallArguments(expr, nextLexem.End, "}", arrayArgs, vars);
+					else {
+						// just [] (empty array)
+						end = nextLexem.Start;
+					}
+				} else {
+					// this is '[ val1, val2 ]' syntax
+					end = ReadCallArguments(expr, nextLexem.Start, "]", arrayArgs, vars);
+				}
+
+				var newArrExpr = Expression.NewArrayInit(typeof(object), arrayArgs);
+				return new ParseResult() {
 					End = end,
-					Expr = Expression.New(LambdaParameterWrapperConstructor, 
+					Expr = Expression.New(LambdaParameterWrapperConstructor,
 						Expression.Convert(newArrExpr, typeof(object)),
 						Expression.Constant(LambdaParamCtx, typeof(LambdaParameterWrapperContext)))
 				};
 			}
 			if (nextLexem.Type == LexemType.Name && nextLexem.GetValue().ToLower() == "dictionary") {
+				// just read it, this is old syntax 'new dictionary { }'
 				nextLexem = ReadLexem(expr, nextLexem.End);
-				if (!(nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "{"))
-					throw new LambdaParserException(expr, nextLexem.Start, "Expected '{'");
-
+			}
+			if (nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "{") {
 				var dictionaryKeys = new List<Expression>();
 				var dictionaryValues = new List<Expression>();
-				do {
-					nextLexem = ReadLexem(expr, nextLexem.End);
-					if (!(nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "{"))
-						throw new LambdaParserException(expr, nextLexem.Start, "Expected '{'");
-					var entryArgs = new List<Expression>();
-					var end = ReadCallArguments(expr, nextLexem.End, "}", entryArgs, vars);
-					if (entryArgs.Count!=2)
-						throw new LambdaParserException(expr, nextLexem.Start, "Dictionary entry should have exactly 2 arguments");
-					
-					dictionaryKeys.Add( entryArgs[0] );
-					dictionaryValues.Add( entryArgs[1] );
-					
-					nextLexem = ReadLexem(expr, end);
-				} while (nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == ",");
+				var startLexem = ReadLexem(expr, nextLexem.End);
+				if (startLexem.Type == LexemType.Delimiter && startLexem.GetValue() == "{") {
+					// this is C#-like syntax: '{ {"key1", "val1"}, {"key2", "val2"} }
+					do {
+						nextLexem = ReadLexem(expr, nextLexem.End);
+						if (!(nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "{"))
+							throw new LambdaParserException(expr, nextLexem.Start, "Expected '{'");
+						var entryArgs = new List<Expression>();
+						var end = ReadCallArguments(expr, nextLexem.End, "}", entryArgs, vars);
+						if (entryArgs.Count!=2)
+							throw new LambdaParserException(expr, nextLexem.Start, "Dictionary entry should have exactly 2 arguments");
 
-				if (!(nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "}"))
-					throw new LambdaParserException(expr, nextLexem.Start, "Expected '}'");
+						dictionaryKeys.Add(entryArgs[0]);
+						dictionaryValues.Add(entryArgs[1]);
 
-				var newKeysArrExpr = Expression.NewArrayInit(typeof(object), dictionaryKeys );
+						nextLexem = ReadLexem(expr, end);
+					} while (nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == ",");
+
+					if (!(nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == "}"))
+						throw new LambdaParserException(expr, nextLexem.Start, "Expected '}'");
+				} else if (startLexem.Type == LexemType.Delimiter && startLexem.GetValue() == "}") {
+					// this is '{}'  - empty object (dictionary)
+					nextLexem = startLexem;
+				} else {
+					// this is JSON-like syntax: { 'key1' : 'val1', 'key2': 'val2' }
+					do {
+						// read key
+						var keyExpr = ParseConditional(expr, nextLexem.End, vars);
+						dictionaryKeys.Add(ExprConvertToObjectIfNeeded(keyExpr.Expr));
+
+						nextLexem = ReadLexem(expr, keyExpr.End);
+						if (!(nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == ":"))
+							throw new LambdaParserException(expr, nextLexem.Start, "Expected ':'");
+
+						// read value
+						var valExpr = ParseConditional(expr, nextLexem.End, vars);
+						dictionaryValues.Add(ExprConvertToObjectIfNeeded(valExpr.Expr));
+
+						nextLexem = ReadLexem(expr, valExpr.End);
+						if (nextLexem.Type == LexemType.Delimiter && (nextLexem.GetValue()=="}" || nextLexem.GetValue()==","))
+							continue;
+						throw new LambdaParserException(expr, nextLexem.Start, "Expected ',' or '}'");
+					} while (nextLexem.Type == LexemType.Delimiter && nextLexem.GetValue() == ",");
+				}
+
+				var newKeysArrExpr = Expression.NewArrayInit(typeof(object), dictionaryKeys);
 				var newValuesArrExpr = Expression.NewArrayInit(typeof(object), dictionaryValues );
-
 				return new ParseResult() {
 					End = nextLexem.End,
 					Expr = Expression.Call(
@@ -734,6 +770,14 @@ namespace NReco.Linq {
 				};
 			}
 			throw new LambdaParserException(expr, start, "Unknown new instance initializer");
+		}
+
+		Expression ExprConvertToObjectIfNeeded(Expression expr) {
+			if (!(expr is ConstantExpression constExpr && constExpr.Value is LambdaParameterWrapper)) {
+				// result may be a primitive type like bool
+				return Expression.Convert(expr, typeof(object));
+			}
+			return expr;
 		}
 
 		protected enum LexemType {

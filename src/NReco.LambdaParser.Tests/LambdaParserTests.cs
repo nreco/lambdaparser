@@ -91,9 +91,27 @@ namespace NReco.Linq.Tests {
 
 			Assert.Equal(true, lambdaParser.Eval(" new[]{ one } == new[] { 1 } ", varContext));
 
+			Assert.Equal("1", (lambdaParser.Eval(" new[ \"1\" ] ", varContext) as IList)[0] );
+			Assert.Equal(3, (lambdaParser.Eval("new[1,2,3]", varContext) as IList).Count);
+			Assert.Throws<LambdaParserException>( ()=>lambdaParser.Eval("new[1 + 5", varContext));
+
+			Assert.Equal("1", (lambdaParser.Eval("[\"1\"] ", varContext) as IList)[0]);
+			Assert.Equal(3, (lambdaParser.Eval("[1,2,3]", varContext) as IList).Count);
+			Assert.Equal(0, (lambdaParser.Eval("[]", varContext) as IList).Count);
+			Assert.Equal("1,2,3", lambdaParser.Eval("testObj.Format(\"{0},{1},{2}\", [1,2,3])", varContext) as string);
+
 			Assert.Equal(3, lambdaParser.Eval(" new dictionary{ {\"a\", 1}, {\"b\", 2}, {\"c\", 3} }.Count ", varContext));
+			Assert.Equal(3, lambdaParser.Eval(" new { {\"a\", 1}, {\"b\", 2}, {\"c\", 3} }.Count ", varContext));
+			Assert.Equal(3, lambdaParser.Eval(" { \"a\": 1, \"b\": 2, \"c\": 3 }.Count ", varContext));
+			Assert.Equal(0, lambdaParser.Eval(" { }.Count ", varContext));
+			Assert.Throws<LambdaParserException>(() => lambdaParser.Eval("{ \"a\": 1, \"b\": 2, }", varContext));
+			Assert.Throws<LambdaParserException>(() => lambdaParser.Eval("{ \"a\"  }", varContext));
+			Assert.Throws<LambdaParserException>(() => lambdaParser.Eval("{ \"a\":  }", varContext));
+			Assert.Throws<LambdaParserException>(() => lambdaParser.Eval("testObj.Format(\"A\", { \"a\": 1, \"b\": 2 )", varContext));
 
 			Assert.Equal(2M, lambdaParser.Eval(" new dictionary{ {\"a\", 1}, {\"b\", 2}, {\"c\", 3} }[\"b\"] ", varContext));
+			Assert.Equal(2M, lambdaParser.Eval(" { \"a\": 1, \"b\": 2, \"c\": 3 }[\"b\"] ", varContext));
+			Assert.Equal(11M, lambdaParser.Eval(" { \"a\": {\"b\": [10,11] } }[\"a\"][\"b\"][1] ", varContext));
 
 			var arr = ((Array)lambdaParser.Eval(" new []{ new dictionary{{\"test\",2}}, new[] { one } }", varContext) );
 			Assert.Equal(2M, ((IDictionary)arr.GetValue(0) )["test"] );

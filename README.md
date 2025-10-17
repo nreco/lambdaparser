@@ -10,7 +10,8 @@ NuGet | Windows x64 | Linux
 * supports arithmetic operations (+, -, *, /, %), comparisons (==, !=, >, <, >=, <=), conditionals including (ternary) operator ( boolVal ? whenTrue : whenFalse )
 * access object properties, call methods and indexers, invoke delegates
 * dynamic typed variables: performs automatic type conversions to match method signature or arithmetic operations
-* create arrays and dictionaries with simplified syntax: `new dictionary{ {"a", 1}, {"b", 2} }` , `new []{ 1, 2, 3}`
+* create arrays with C#-like or JSON syntax: `new []{ 1, 2, 3}` or `new [1, 2, 3]` or just `[1, 2, 3]`
+* create dictionaries (key-value map) with C#-like or JSON syntax: `new dictionary{ {"a", 1}, {"b", 2} }` or `new {"a":1}` or `{"a":1, "b":2}` 
 * local variables that may go before main expression: `var a = 5; var b = contextVar/total*100;`  (disabled by default, to enable use `LambdaParser.AllowVars` property)
 
 Nuget package: [NReco.LambdaParser](https://www.nuget.org/packages/NReco.LambdaParser/)
@@ -55,6 +56,6 @@ lambdaParser.UseCache = false;
 NReco.LambdaParser is in production use at [SeekTable.com](https://www.seektable.com/) and [PivotData microservice](https://www.nrecosite.com/pivotdata_service.aspx) (used for user-defined calculated cube members: formulas, custom formatting).
 
 ## License
-Copyright 2016-2024 Vitaliy Fedorchenko and contributors
+Copyright 2016-2025 Vitaliy Fedorchenko and contributors
 
 Distributed under the MIT license
