@@ -8,7 +8,7 @@ Source code and examples: https://github.com/nreco/lambdaparser
     <Title>Dynamic expressions evaluator</Title>
     <Copyright>Copyright (c) 2013-2025 Vitalii Fedorchenko and contributors</Copyright>
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
-    <VersionPrefix>1.2.0</VersionPrefix>
+    <VersionPrefix>1.2.1</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
     <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -18,6 +18,9 @@ Source code and examples: https://github.com/nreco/lambdaparser
     <PackageId>NReco.LambdaParser</PackageId>
     <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;netstandard;netcore;net45;</PackageTags>
 	<PackageReleaseNotes>
+v.1.2.1 changes:
+- Incorrect parse of the method argument when it starts with delimiter #57
+	
 v.1.2.0 changes:
 - Json-like syntax for arrays/dictionaries #56 (+ allow to create an empty array / an empty dictionary)
 	
@@ -61,7 +64,7 @@ v.1.0.6 changes:
 - default ValueComparer implementation with options: NullComparison (MinValue, Sql), SuppressErrors
 - starting from this version expression cache is instance specific (was global) because calculation result may depend on IValueComparer implementation	
 </PackageReleaseNotes>	
-    <PackageIconUrl>https://www.nrecosite.com/img/logo.svg</PackageIconUrl>
+    <PackageIconUrl>https://www.nrecosite.com/img/nreco-logo-200.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/nreco/lambdaparser</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/nreco/lambdaparser/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/nreco/lambdaparser</RepositoryUrl>
