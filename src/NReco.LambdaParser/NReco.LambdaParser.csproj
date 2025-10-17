@@ -8,21 +8,19 @@ Source code and examples: https://github.com/nreco/lambdaparser
     <Title>Dynamic expressions evaluator</Title>
     <Copyright>Copyright (c) 2013-2025 Vitalii Fedorchenko and contributors</Copyright>
     <AssemblyTitle>NReco.LambdaParser</AssemblyTitle>
-    <VersionPrefix>1.2.1</VersionPrefix>
+    <VersionPrefix>1.2.2</VersionPrefix>
     <Authors>Vitalii Fedorchenko</Authors>
     <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>NReco.LambdaParser</AssemblyName>
     <AssemblyOriginatorKeyFile>NReco.LambdaParser.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>False</SignAssembly>
+    <SignAssembly>True</SignAssembly>
     <PackageId>NReco.LambdaParser</PackageId>
     <PackageTags>LambdaParser;Formula;Parser;Math;Expression;Evaluator;Eval;LINQ-dynamic;netstandard;netcore;net45;</PackageTags>
 	<PackageReleaseNotes>
-v.1.2.1 changes:
-- Incorrect parse of the method argument when it starts with delimiter #57
-	
-v.1.2.0 changes:
+v.1.2.2 changes:
 - Json-like syntax for arrays/dictionaries #56 (+ allow to create an empty array / an empty dictionary)
+- Incorrect parse of the method argument when it starts with delimiter #57
 	
 v.1.1.3 changes:
 - fixed version mismatch #52
