@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Xunit;
 
@@ -79,6 +79,13 @@ namespace NReco.Linq.Tests {
 
 			Assert.Equal(true, lambdaParser.Eval(" (1+testObj.IntProp)==2 ? testObj.FldTrue : false ", varContext));
 
+			Assert.Equal("3", lambdaParser.Eval("toString( (1+2) )", varContext) as string);
+			Assert.Equal("3", lambdaParser.Eval("(1+2).ToString()", varContext) as string);
+
+			Assert.Throws<LambdaParserException>(() => lambdaParser.Eval("toString( (1+2)", varContext));
+			Assert.Throws<LambdaParserException>(() => lambdaParser.Eval("toString( (1+2), )", varContext));
+			Assert.Throws<LambdaParserException>(() => lambdaParser.Eval("toString( 1 ", varContext));
+
 			Assert.Equal("ab2_3", lambdaParser.Eval(" \"a\"+testObj.Format(\"b{0}_{1}\", 2, \"3\".ToString() ).ToString() ", varContext));
 
 			Assert.Equal(true, lambdaParser.Eval(" testObj.Hash[\"a\"] == \"1\"", varContext));
@@ -104,6 +111,9 @@ namespace NReco.Linq.Tests {
 			Assert.Equal(3, lambdaParser.Eval(" new { {\"a\", 1}, {\"b\", 2}, {\"c\", 3} }.Count ", varContext));
 			Assert.Equal(3, lambdaParser.Eval(" { \"a\": 1, \"b\": 2, \"c\": 3 }.Count ", varContext));
 			Assert.Equal(0, lambdaParser.Eval(" { }.Count ", varContext));
+
+			Assert.Equal("1", lambdaParser.Eval("toString( { \"a\": 1 }.Count ) ", varContext) as string);
+			
 			Assert.Throws<LambdaParserException>(() => lambdaParser.Eval("{ \"a\": 1, \"b\": 2, }", varContext));
 			Assert.Throws<LambdaParserException>(() => lambdaParser.Eval("{ \"a\"  }", varContext));
 			Assert.Throws<LambdaParserException>(() => lambdaParser.Eval("{ \"a\":  }", varContext));

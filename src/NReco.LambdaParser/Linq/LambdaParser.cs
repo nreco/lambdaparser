@@ -610,17 +610,20 @@ namespace NReco.Linq {
 			do {
 				var lexem = ReadLexem(expr, end);
 				if (lexem.Type == LexemType.Delimiter) {
-					if (lexem.GetValue() == endLexem) {
-						return lexem.End;
-					} else if (lexem.GetValue() == ",") {
+					if (lexem.GetValue()==endLexem)
+						return lexem.End; // no more arguments
+
+					if (lexem.GetValue()==",") {
 						if (args.Count == 0) {
-							throw new LambdaParserException(expr, lexem.Start, "Value missed");
+							throw new LambdaParserException(expr, lexem.Start, "Value expected before ','");
 						}
 						end = lexem.End;
-					} else {
-						throw new LambdaParserException(expr, lexem.Start, String.Format("Expected '{0}' or ','", endLexem));
-					}
+					} 
 				}
+				if (lexem.Type==LexemType.Stop) {
+					throw new LambdaParserException(expr, lexem.Start, String.Format("Expected '{0}' or ','", endLexem));
+				}
+
 				// read parameter
 				var paramExpr = ParseConditional(expr, end, vars);
 				args.Add(ExprConvertToObjectIfNeeded(paramExpr.Expr));
